@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="summary-section(executionTracker, cacheStats)" th:with="
+        totalTestClasses=${executionTracker.getTotalTestClasses()},
+        totalTestMethods=${executionTracker.getTotalTestMethods()},
+        totalDurationMs=${executionTracker.getOverallDuration().toMillis()}">
+        
+        <h2>Test Execution Summary</h2>
+        <div class="execution-info">
+            <div class="execution-detail">
+                <strong>Executed via:</strong> <span th:text="${executionEnvironment}">Unknown</span>
+            </div>
+            <div class="execution-detail">
+                <strong>Execution Time:</strong> <span th:text="${#temporals.format(executionTimestamp, 'yyyy-MM-dd HH:mm:ss')}">2025-01-01 12:00:00</span>
+            </div>
+            <div class="execution-detail">
+                <strong>Time Zone:</strong> <span th:text="${timeZone}">UTC</span>
+            </div>
+        </div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>Test Classes</h3>
+                <div class="value" th:text="${totalTestClasses}">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Tests</h3>
+                <div class="value" th:text="${totalTestMethods}">0</div>
+            </div>
+            <div class="summary-card passed">
+                <h3>Passed</h3>
+                <div class="value" th:text="${passedTests}">0</div>
+            </div>
+            <div class="summary-card failed">
+                <h3>Failed</h3>
+                <div class="value" th:text="${failedTests}">0</div>
+            </div>
+            <div class="summary-card disabled">
+                <h3>Disabled</h3>
+                <div class="value" th:text="${disabledTests}">0</div>
+            </div>
+            <div class="summary-card aborted">
+                <h3>Aborted</h3>
+                <div class="value" th:text="${abortedTests}">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Runtime</h3>
+                <div class="value" style="font-size: 24px;" th:text="${durationFormatter.format(totalDurationMs)}">0ms</div>
+            </div>
+            <div class="summary-card">
+                <h3>Success Rate</h3>
+                <div class="value" style="font-size: 24px;" th:text="${#numbers.formatDecimal(successRate, 1, 1) + '%'}">0%</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
