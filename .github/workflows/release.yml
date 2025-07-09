@@ -36,7 +36,7 @@ jobs:
       - name: Run JReleaser
         uses: jreleaser/release-action@v2
         with:
-          arguments: full-release
+          arguments: 'full-release --git-root-search'
           version: 1.14.0
           working-directory: spring-test-insight-extension
         env:

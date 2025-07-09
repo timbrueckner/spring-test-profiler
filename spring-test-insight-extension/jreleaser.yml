@@ -14,7 +14,7 @@ project:
   java:
     groupId: digital.pragmatech
     version: 17
-  inceptionYear: 2025
+  inceptionYear: '2025'
 
 signing:
   active: ALWAYS
