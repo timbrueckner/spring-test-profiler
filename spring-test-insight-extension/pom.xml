@@ -28,9 +28,10 @@
   </scm>
 
   <properties>
-    <spring.version>6.1.16</spring.version>
-    <junit-platform.version>1.11.3</junit-platform.version>
-    <junit-jupiter.version>5.13.2</junit-jupiter.version>
+    <spring.version>6.1.10</spring.version>
+        <junit-jupiter.version>5.13.2</junit-jupiter.version>
+        <jackson.version>2.17.1</jackson.version>
+        <assertj.version>3.26.3</assertj.version>
 
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
@@ -92,11 +93,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>${spring.version}</version>
-      <scope>provided</scope>
-    </dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- Jackson for JSON serialization (provided as it's part of Spring Boot) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>

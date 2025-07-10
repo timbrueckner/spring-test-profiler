@@ -9,7 +9,11 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Simple test execution listener that captures a TestContext reference
  * so we can access Spring's DefaultContextCache later.
+ * 
+ * @deprecated This functionality has been consolidated into {@link SpringTestInsightListener}.
+ *             This class will be removed in a future version.
  */
+@Deprecated
 public class SpringContextCacheStatistics extends AbstractTestExecutionListener {
     
     // Hold a reference to a TestContext so we can access the cache later
@@ -23,21 +27,20 @@ public class SpringContextCacheStatistics extends AbstractTestExecutionListener 
     
     /**
      * Gets the Spring ContextCache if available.
+     * @deprecated Use {@link SpringTestInsightListener#getContextCache()} instead.
      */
+    @Deprecated
     public static ContextCache getContextCache() {
-        TestContext context = lastTestContext.get();
-        if (context != null) {
-            return SpringContextCacheAccessor.getContextCache(context);
-        }
-        return null;
+        return SpringTestInsightListener.getContextCache();
     }
     
     /**
      * Gets cache statistics from Spring's DefaultContextCache.
+     * @deprecated Use {@link SpringTestInsightListener#getCacheStatistics()} instead.
      */
+    @Deprecated
     public static SpringContextCacheAccessor.CacheStatistics getCacheStatistics() {
-        ContextCache cache = getContextCache();
-        return SpringContextCacheAccessor.getCacheStatistics(cache);
+        return SpringTestInsightListener.getCacheStatistics();
     }
     
     @Override

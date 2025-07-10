@@ -1,5 +1,6 @@
 package digital.pragmatech.springtestinsight;
 
+import digital.pragmatech.springtestinsight.reporting.JsonReportGenerator;
 import digital.pragmatech.springtestinsight.reporting.TemplateHelpers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,11 @@ public class TestExecutionReporter {
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     
     private final TemplateEngine templateEngine;
-    
+    private final JsonReportGenerator jsonReportGenerator;
+
     public TestExecutionReporter() {
         this.templateEngine = createTemplateEngine();
+        this.jsonReportGenerator = new JsonReportGenerator();
     }
     
     public void generateReport(String phase, TestExecutionTracker executionTracker, SpringContextCacheAccessor.CacheStatistics cacheStats) {
@@ -39,28 +42,36 @@ public class TestExecutionReporter {
     public void generateReport(String phase, TestExecutionTracker executionTracker, 
                              SpringContextCacheAccessor.CacheStatistics cacheStats, 
                              ContextCacheTracker contextCacheTracker) {
+
+        // Beta feature flag for JSON reporting
+        boolean jsonReportingEnabled = Boolean.parseBoolean(System.getProperty("spring.test.insight.json.beta", "false"));
+
         try {
             Path reportDir = determineReportDirectory();
             Files.createDirectories(reportDir);
-            
-            String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMATTER);
-            String reportFileName = phase.equals("default") ? 
-                "test-insight-report-" + timestamp + ".html" :
-                "test-insight-report-" + phase + "-" + timestamp + ".html";
-            Path reportFile = reportDir.resolve(reportFileName);
-            
-            String htmlContent = generateHtmlWithThymeleaf(phase, executionTracker, cacheStats, contextCacheTracker);
-            Files.write(reportFile, htmlContent.getBytes());
-            
-            logger.info("Spring Test Insight report generated for {} phase: {}", phase, reportFile.toAbsolutePath());
-            
-            // Also create a latest.html symlink for easy access
-            String latestFileName = phase.equals("default") ? "latest.html" : "latest-" + phase + ".html";
-            Path latestLink = reportDir.resolve(latestFileName);
-            Files.deleteIfExists(latestLink);
-            Files.write(latestLink, htmlContent.getBytes());
-            
-            
+
+            if (jsonReportingEnabled) {
+                jsonReportGenerator.generateJsonReport(reportDir, phase, executionTracker, cacheStats, contextCacheTracker);
+            } else {
+                // Original HTML reporting logic
+                String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMATTER);
+                String reportFileName = phase.equals("default") ? 
+                    "test-insight-report-" + timestamp + ".html" :
+                    "test-insight-report-" + phase + "-" + timestamp + ".html";
+                Path reportFile = reportDir.resolve(reportFileName);
+                
+                String htmlContent = generateHtmlWithThymeleaf(phase, executionTracker, cacheStats, contextCacheTracker);
+                Files.write(reportFile, htmlContent.getBytes());
+                
+                logger.info("Spring Test Insight report generated for {} phase: {}", phase, reportFile.toAbsolutePath());
+                
+                // Also create a latest.html symlink for easy access
+                String latestFileName = phase.equals("default") ? "latest.html" : "latest-" + phase + ".html";
+                Path latestLink = reportDir.resolve(latestFileName);
+                Files.deleteIfExists(latestLink);
+                Files.write(latestLink, htmlContent.getBytes());
+            }
+
         } catch (IOException e) {
             logger.error("Failed to generate Spring Test Insight report", e);
         }
@@ -232,6 +243,9 @@ public class TestExecutionReporter {
             context.setVariable("executionTimestamp", LocalDateTime.now());
             context.setVariable("timeZone", ZoneId.systemDefault().getId());
             
+            // Extension version info
+            context.setVariable("extensionVersion", getExtensionVersion());
+            
             // Pre-compute test status counts to avoid complex template expressions
             Map<String, TestExecutionTracker.TestClassMetrics> classMetrics = executionTracker.getClassMetrics();
             long passedTests = TemplateHelpers.countTestsByStatus(classMetrics, "PASSED");
@@ -296,6 +310,39 @@ public class TestExecutionReporter {
         } catch (Exception e) {
             logger.error("Could not load CSS file. Report generation will fail.", e);
             throw new RuntimeException("CSS file not found", e);
+        }
+    }
+    
+    /**
+     * Gets the extension version from the package implementation version.
+     * This works when the extension is packaged as a JAR with proper manifest.
+     */
+    private String getExtensionVersion() {
+        try {
+            // Try to get version from the package implementation version (works when JAR has proper manifest)
+            Package pkg = TestExecutionReporter.class.getPackage();
+            if (pkg != null && pkg.getImplementationVersion() != null) {
+                return "v" + pkg.getImplementationVersion();
+            }
+            
+            // Fallback: try to read from Maven properties file
+            try (var inputStream = getClass().getClassLoader()
+                    .getResourceAsStream("META-INF/maven/digital.pragmatech/spring-test-insight-extension/pom.properties")) {
+                if (inputStream != null) {
+                    var properties = new java.util.Properties();
+                    properties.load(inputStream);
+                    String version = properties.getProperty("version");
+                    if (version != null) {
+                        return "v" + version;
+                    }
+                }
+            }
+            
+            // Final fallback
+            return "v0.0.1-SNAPSHOT";
+        } catch (Exception e) {
+            logger.debug("Could not determine extension version", e);
+            return "v0.0.1-SNAPSHOT";
         }
     }
     

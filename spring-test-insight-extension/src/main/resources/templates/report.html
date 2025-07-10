@@ -29,6 +29,26 @@
         
     </div>
     
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>
+                Generated on <span th:text="${generatedAt}">2025-01-01 12:00:00</span> 
+                by <strong>Spring Test Insight</strong> 
+                <span th:text="${extensionVersion}">v0.0.1-SNAPSHOT</span>
+            </p>
+            <p>
+                <a href="https://github.com/PragmaTech-GmbH/spring-test-insight" target="_blank" rel="noopener noreferrer">
+                    🚀 PragmaTech GmbH
+                </a>
+                | 
+                <a href="https://pragmatech.digital" target="_blank" rel="noopener noreferrer">
+                    pragmatech.digital
+                </a>
+            </p>
+        </div>
+    </footer>
+    
     <script>
         function toggleClass(element) {
             const methods = element.nextElementSibling;

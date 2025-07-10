@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Spring TestExecutionListener that tracks test execution and context cache usage.
@@ -33,6 +34,9 @@ public class SpringTestInsightListener extends AbstractTestExecutionListener {
     
     // Static flag to ensure report is generated only once
     private static volatile boolean reportGenerated = false;
+    
+    // Hold a reference to a TestContext so we can access the cache later (consolidated from SpringContextCacheStatistics)
+    private static final AtomicReference<TestContext> lastTestContext = new AtomicReference<>();
     
     @Override
     public int getOrder() {
@@ -55,6 +59,9 @@ public class SpringTestInsightListener extends AbstractTestExecutionListener {
         // Record test class start
         testClassNames.put(testContext, className);
         executionTracker.recordTestClassStart(className);
+        
+        // Capture the TestContext reference for cache access (consolidated from SpringContextCacheStatistics)
+        lastTestContext.set(testContext);
         
         // Extract and track context configuration
         try {
@@ -198,7 +205,7 @@ public class SpringTestInsightListener extends AbstractTestExecutionListener {
                 
                 // Get context cache statistics including our custom tracking
                 SpringContextCacheAccessor.CacheStatistics springStats = 
-                    SpringContextCacheStatistics.getCacheStatistics();
+                    getCacheStatistics();
                 
                 // Generate report with both execution and context cache data
                 reporter.generateReport(phase, executionTracker, springStats, contextCacheTracker);
@@ -223,5 +230,24 @@ public class SpringTestInsightListener extends AbstractTestExecutionListener {
      */
     public static ContextCacheTracker getContextCacheTracker() {
         return contextCacheTracker;
+    }
+    
+    /**
+     * Gets the Spring ContextCache if available (consolidated from SpringContextCacheStatistics).
+     */
+    public static org.springframework.test.context.cache.ContextCache getContextCache() {
+        TestContext context = lastTestContext.get();
+        if (context != null) {
+            return SpringContextCacheAccessor.getContextCache(context);
+        }
+        return null;
+    }
+    
+    /**
+     * Gets cache statistics from Spring's DefaultContextCache (consolidated from SpringContextCacheStatistics).
+     */
+    public static SpringContextCacheAccessor.CacheStatistics getCacheStatistics() {
+        org.springframework.test.context.cache.ContextCache cache = getContextCache();
+        return SpringContextCacheAccessor.getCacheStatistics(cache);
     }
 }
