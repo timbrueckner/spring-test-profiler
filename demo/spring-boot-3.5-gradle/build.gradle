@@ -26,18 +26,31 @@ dependencies {
   runtimeOnly 'com.h2database:h2'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
-  testImplementation 'digital.pragmatech:spring-test-insight-extension:0.0.1-SNAPSHOT'
+  testImplementation 'digital.pragmatech:spring-test-profiler-extension:0.0.1-SNAPSHOT'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+test {
   useJUnitPlatform()
+  exclude '**/*IT.class'
+
+  testLogging {
+    events "passed"
+  }
 }
 
-compileJava {
-  options.compilerArgs << '-parameters'
+tasks.register('integrationTest', Test) {
+  description = 'Runs integration tests.'
+  group = 'verification'
+
+  useJUnitPlatform()
+  include '**/*IT.class'
+
+  testLogging {
+    events "passed"
+  }
 }
 
-compileTestJava {
-  options.compilerArgs << '-parameters'
+tasks.named('check') {
+  dependsOn integrationTest
 }

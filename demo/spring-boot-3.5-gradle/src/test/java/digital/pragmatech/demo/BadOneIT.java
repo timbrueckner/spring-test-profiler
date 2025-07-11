@@ -1,7 +1,5 @@
 package digital.pragmatech.demo;
 
-import java.math.BigDecimal;
-
 import digital.pragmatech.demo.entity.Book;
 import digital.pragmatech.demo.entity.BookCategory;
 import digital.pragmatech.demo.repository.BookRepository;
@@ -15,8 +13,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * BAD EXAMPLE: This test uses @DirtiesContext unnecessarily,
@@ -32,13 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
   "logging.level.org.springframework.web=DEBUG"  // Different logging config
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // BAD: Forces context reload
-public class BadOneIT {
+class BadOneIT {
 
-  private final BookRepository bookRepository;
-
-  public BadOneIT(@Autowired BookRepository bookRepository) {
-    this.bookRepository = bookRepository;
-  }
+  @Autowired
+  private BookRepository bookRepository;
 
   @Test
   void testCreateBook() {

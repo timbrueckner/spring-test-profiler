@@ -2,9 +2,6 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-      - init
 
 jobs:
   test-extension:
@@ -21,14 +18,14 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-          cache-dependency-path: 'spring-test-insight-extension/pom.xml'
+          cache-dependency-path: 'spring-test-profiler-extension/pom.xml'
 
       - name: Test extension
-        working-directory: spring-test-insight-extension
+        working-directory: spring-test-profiler-extension
         run: ./mvnw verify
 
   test-maven-demos:
-    name: Test Gradle Demo Projects
+    name: Test Maven Demo Projects
     runs-on: ubuntu-latest
     needs: test-extension
     strategy:
@@ -53,7 +50,7 @@ jobs:
           cache-dependency-path: 'demo/${{ matrix.demo }}/pom.xml'
 
       - name: Install extension to local repository
-        working-directory: spring-test-insight-extension
+        working-directory: spring-test-profiler-extension
         run: ./mvnw clean install -DskipTests
 
       - name: Build demo project
@@ -91,7 +88,7 @@ jobs:
           cache-dependency-path: 'demo/${{ matrix.demo }}/build.gradle'
 
       - name: Install extension to local repository
-        working-directory: spring-test-insight-extension
+        working-directory: spring-test-profiler-extension
         run: ./mvnw clean install -DskipTests
 
       - name: Build demo project

@@ -34,19 +34,19 @@ build_demo() {
     local demo_path="$1"
     local demo_name="$(basename "$demo_path")"
     local build_command="$2"
-    
+
     print_status "Building demo: $demo_name"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    
+
     cd "$demo_path"
-    
+
     if eval "$build_command"; then
         print_success "$demo_name build completed successfully"
     else
         print_error "$demo_name build failed"
         exit 1
     fi
-    
+
     echo
     cd - > /dev/null
 }
@@ -68,8 +68,8 @@ fi
 # Build extension first
 print_status "Building Spring Test Insight Extension"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-cd "$SCRIPT_DIR/spring-test-insight-extension"
-if mvn clean install -q; then
+cd "$SCRIPT_DIR/spring-test-profiler-extension"
+if ./mvnw install -q; then
     print_success "Extension built and installed to local repository"
 else
     print_error "Extension build failed"
@@ -80,11 +80,11 @@ cd - > /dev/null
 
 # Demo projects and their build commands
 DEMOS=(
-    "spring-boot-3.4-maven:./mvnw clean test"
-    "spring-boot-3.5-maven:./mvnw clean test"
-    "spring-boot-3.5-gradle:./gradlew clean test"
-    "spring-boot-3.5-maven-failsafe-parallel:./mvnw clean verify"
-    "spring-boot-3.5-maven-junit-parallel:./mvnw clean verify"
+    "spring-boot-3.4-maven:./mvnw verify"
+    "spring-boot-3.5-maven:./mvnw verify"
+    "spring-boot-3.5-gradle:./gradlew build"
+    "spring-boot-3.5-maven-failsafe-parallel:./mvnw verify"
+    "spring-boot-3.5-maven-junit-parallel:./mvnw verify"
 )
 
 # Track results
@@ -96,12 +96,12 @@ for demo_entry in "${DEMOS[@]}"; do
     demo="${demo_entry%%:*}"
     build_command="${demo_entry#*:}"
     demo_path="$DEMO_DIR/$demo"
-    
+
     if [ ! -d "$demo_path" ]; then
         print_warning "Demo directory not found: $demo_path (skipping)"
         continue
     fi
-    
+
     if build_demo "$demo_path" "$build_command"; then
         SUCCESSFUL_BUILDS+=("$demo")
     else
@@ -131,5 +131,5 @@ if [ ${#FAILED_BUILDS[@]} -gt 0 ]; then
     exit 1
 else
     print_success "All demo projects built successfully! 🎉"
-    print_status "Spring Test Insight reports have been generated in each demo's target/spring-test-insight/ directory"
+    print_status "Spring Test Insight reports have been generated in each demo's target/spring-test-profiler/ directory"
 fi
