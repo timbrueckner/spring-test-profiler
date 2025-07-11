@@ -1,6 +1,11 @@
-# Spring Test Insight
+# Spring Test Profiler
+
+![](docs/resources/spring-test-profiler-logo-256x256.png)
 
 A JUnit Jupiter extension that provides visualization and insights for Spring Test execution, with a focus on Spring context caching statistics.
+
+
+[![Build & Test Maven Project (main)](https://github.com/PragmaTech-GmbH/spring-test-profiler/workflows/CI/badge.svg)](https://github.com/PragmaTech-GmbH/spring-test-profiler/actions/workflows/ci.yml?query=branch%3Amain)
 
 ## Features
 
@@ -14,7 +19,9 @@ A JUnit Jupiter extension that provides visualization and insights for Spring Te
 
 ## Usage
 
-### Quick Start
+[![](https://img.shields.io/badge/Latest%20Version-0.9.0-orange)](/spring-test-profiler-extension/pom.xml)
+
+### Quick Start Maven
 
 Add the dependency to your project:
 
@@ -22,10 +29,20 @@ Add the dependency to your project:
 <dependency>
     <groupId>digital.pragmatech</groupId>
     <artifactId>spring-test-profiler-extension</artifactId>
-    <version>1.0.0</version>
+    <version>0.9.0</version>
     <scope>test</scope>
 </dependency>
 ```
+
+
+### Quick Start Gradle
+
+Add the dependency to your project:
+
+```groovy
+testImplementation('digital.pragmatech:spring-test-profiler-extension:0.9.0')
+```
+
 
 ### Automatic Activation (Recommended)
 
@@ -61,16 +78,8 @@ After test execution, find the HTML report at:
 - Maven: `target/spring-test-profiler/latest.html`
 - Gradle: `build/spring-test-profiler/latest.html`
 
-### Demo Project
+### Demo Report
 
-See the `demo` directory for a complete Spring Boot example showcasing the extension.
-
-```bash
-# Run the demo
-cd demo
-mvn clean test
-# Open target/spring-test-profiler/latest.html
-```
 
 ## Bug Reports
 
@@ -92,54 +101,14 @@ We welcome contributions! Here's how to get started:
 
 1. **Fork and clone** the repository
 2. **Build the project**:
-   ```bash
-   cd spring-test-profiler-extension
-   ./mvnw clean install
-   ```
+
+```bash
+cd spring-test-profiler-extension
+./mvnw install
+```
+
 3. **Run tests**:
-   ```bash
-   ./mvnw test
-   ```
 
-### Making Changes
-
-1. **Create a feature branch** from `main`
-2. **Make your changes** following the existing code style
-3. **Add tests** for new functionality
-4. **Ensure all tests pass**:
-   ```bash
-   ./mvnw clean verify
-   ```
-5. **Test with the demo**:
-   ```bash
-   cd demo
-   mvn clean test
-   ```
-
-### Submitting Changes
-
-1. **Commit your changes** with clear, descriptive messages
-2. **Push to your fork** and create a pull request
-3. **Describe your changes** in the PR description
-4. **Wait for review** and address any feedback
-
-### Code Style
-
-- Follow existing Java conventions
-- Use meaningful variable and method names
-- Add JavaDoc for public APIs
-- Keep methods focused and concise
-
-### Areas for Contribution
-
-- Additional report formats (JSON, XML)
-- Integration with other testing frameworks
-- Performance optimizations
-- Documentation improvements
-- Bug fixes and testing
-
-## Requirements
-
-- Java 21+
-- Spring 6+
-- JUnit Jupiter 5.8+
+```bash
+./mvnw test
+```
