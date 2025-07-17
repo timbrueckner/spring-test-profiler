@@ -8,7 +8,10 @@ A Spring Test utility that provides visualization and insights for Spring Test e
 
 ## Features
 
-**Overall goal**: Identify optimization opportunities in your Spring Test suite to speed up your builds and ship faster 🚤
+**Overall goal**: Identify optimization opportunities in your Spring Test suite to speed up your builds and ship to production faster and with more confidence 🚤
+
+![Demo Report](docs/spring-test-profiler-report-sample.png)
+
 
 This profiler helps you:
 
@@ -108,10 +111,6 @@ After test execution, find the HTML report at:
 - Gradle: `build/spring-test-profiler/latest.html`
 
 ## Demo Report
-
-Download and view a sample report to see the profiler in action:
-
-![Demo Report](docs/spring-test-profiler-report-sample.png)
 
 Download the full sample report [here](docs/test-profiler-report-pet-clinic-2025-07-latest.html) and open it in your browser.
 
