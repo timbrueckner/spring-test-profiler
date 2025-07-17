@@ -10,8 +10,9 @@ A Spring Test utility that provides visualization and insights for Spring Test e
 
 **Overall goal**: Identify optimization opportunities in your Spring Test suite to speed up your builds and ship to production faster and with more confidence 🚤
 
-![Demo Report](docs/spring-test-profiler-report-sample.png)
-
+<p align="center">
+  <img src="docs/spring-test-profiler-report-sample.png" alt="Spring Test Profiler Report" />
+</p>
 
 This profiler helps you:
 
