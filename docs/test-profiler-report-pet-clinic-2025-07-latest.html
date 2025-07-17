@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Test Profiler Report</title>
+  <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+  <style>* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.timestamp {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.theory-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.theory-header {
+    cursor: pointer;
+    user-select: none;
+    padding: 10px 0;
+    border-bottom: 1px solid #ecf0f1;
+    margin-bottom: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.theory-header:hover {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin: 0 -15px 20px -15px;
+}
+
+.theory-header h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2c3e50;
+}
+
+.toggle-icon {
+    font-size: 14px;
+    color: #7f8c8d;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    width: 20px;
+}
+
+.toggle-icon.expanded {
+    transform: rotate(90deg);
+}
+
+.theory-subtitle {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin: 5px 0 0 30px;
+    font-style: italic;
+}
+
+.theory-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.theory-content h3 {
+    color: #2c3e50;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.theory-content ul {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.theory-content li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.cache-behavior {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 25px 0;
+}
+
+.cache-hit, .cache-miss {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid;
+}
+
+.cache-hit {
+    border-color: #27ae60;
+}
+
+.cache-miss {
+    border-color: #e74c3c;
+}
+
+.cache-hit h4, .cache-miss h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.docs-links {
+    background: #ecf0f1;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 25px;
+}
+
+.docs-links h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.docs-links a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.docs-links a:hover {
+    text-decoration: underline;
+}
+
+.execution-info {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.execution-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.execution-detail strong {
+    color: #7f8c8d;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.execution-detail span {
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .execution-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .execution-detail {
+        flex-direction: row;
+        gap: 8px;
+    }
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.summary-card h3 {
+    color: #7f8c8d;
+    font-size: 14px;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+.summary-card .value {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.summary-card.passed .value { color: #27ae60; }
+.summary-card.failed .value { color: #e74c3c; }
+.summary-card.disabled .value { color: #95a5a6; }
+.summary-card.aborted .value { color: #f39c12; }
+
+.cache-stats {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.cache-metric {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.cache-metric:last-child {
+    border-bottom: none;
+}
+
+.cache-metric .label {
+    font-weight: 500;
+}
+
+.cache-metric .value {
+    font-weight: bold;
+}
+
+.hit-rate {
+    color: #27ae60;
+}
+
+.cache-overview {
+    margin-bottom: 25px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 20px;
+}
+
+.context-cache-details h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.cache-entry {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3498db;
+}
+
+.cache-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.cache-id {
+    color: #2c3e50;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.bean-count {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.test-classes {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.test-classes .test-class {
+    color: #34495e;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.test-class {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.test-class-header {
+    padding: 15px 20px;
+    background: #34495e;
+    color: white;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.test-class-header:hover {
+    background: #2c3e50;
+}
+
+.test-class-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+}
+
+.test-methods {
+    padding: 20px;
+    display: none;
+}
+
+.test-methods.show {
+    display: block;
+}
+
+.test-method {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid;
+    background: #f8f9fa;
+}
+
+.test-method.passed {
+    border-color: #27ae60;
+}
+
+.test-method.failed {
+    border-color: #e74c3c;
+}
+
+.test-method.disabled {
+    border-color: #95a5a6;
+}
+
+.test-method.aborted {
+    border-color: #f39c12;
+}
+
+.test-method-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.test-method-name {
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+.test-duration {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.execution-overview {
+    background: #e8f5e8;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #27ae60;
+}
+
+.test-class-package {
+    font-size: 12px;
+    color: #7f8c8d;
+    font-family: 'Courier New', monospace;
+}
+
+.context-info {
+    background: #f0f8ff;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3498db;
+}
+
+.context-info h4 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.context-metrics {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.context-metric {
+    background: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    border: 1px solid #bdc3c7;
+}
+
+.test-method-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.test-status {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #ecf0f1;
+    color: #2c3e50;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.test-reason {
+    margin-top: 8px;
+    padding: 8px;
+    background: #fff3cd;
+    border-radius: 4px;
+    font-size: 13px;
+    border-left: 3px solid #ffc107;
+}
+
+.error-details {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fee;
+    border-radius: 4px;
+    font-size: 12px;
+    border-left: 3px solid #e74c3c;
+}
+
+.error-details h5 {
+    margin: 0 0 8px 0;
+    color: #c0392b;
+    font-size: 13px;
+}
+
+.error-details pre {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.cache-keys-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.cache-key-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3498db;
+}
+
+.cache-key-name {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.cache-key-usage {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.cache-key-stat {
+    background: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    border: 1px solid #bdc3c7;
+}
+
+.test-classes-list {
+    margin-top: 10px;
+}
+
+.test-class-tag {
+    display: inline-block;
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin: 2px 4px 2px 0;
+    border: 1px solid #bbdefb;
+}
+
+.context-configs-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.context-config-item {
+    border: 1px solid #ecf0f1;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+}
+
+.context-config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.context-config-id {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.context-config-test-count {
+    background: #3498db;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.context-bean-count {
+    background: #9b59b6;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.config-details {
+    background: white;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+    font-family: monospace;
+    font-size: 12px;
+    overflow-x: auto;
+}
+
+.config-detail-item {
+    margin: 5px 0;
+    display: flex;
+    align-items: flex-start;
+}
+
+.config-detail-key {
+    font-weight: bold;
+    color: #7f8c8d;
+    min-width: 150px;
+    margin-right: 10px;
+}
+
+.config-detail-value {
+    color: #2c3e50;
+    word-break: break-word;
+}
+
+.context-test-classes {
+    margin-top: 10px;
+}
+
+.context-test-class {
+    display: inline-block;
+    background: #e8f4f8;
+    color: #2c3e50;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-family: monospace;
+}
+
+/* Context complexity analysis styles */
+.context-complexity {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    border-left: 4px solid #bdc3c7;
+}
+
+.complexity-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+/* Footer styles */
+.footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    border-top: 2px solid #e9ecef;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    text-align: center;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-content p {
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+.footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Optimization Section Styles */
+.optimization-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.optimization-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.optimization-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.optimization-metric {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+    border-left: 4px solid #3498db;
+}
+
+.optimization-metric.potential-savings {
+    border-left-color: #27ae60;
+    background: linear-gradient(135deg, #d5f4e6 0%, #f8f9fa 100%);
+}
+
+.optimization-metric.wasted-time {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, #fde8e8 0%, #f8f9fa 100%);
+}
+
+.optimization-metric .label {
+    display: block;
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.optimization-metric .value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.optimization-metric .value.large {
+    font-size: 32px;
+    color: #27ae60;
+}
+
+.optimization-metric .percentage {
+    display: block;
+    font-size: 12px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.optimization-opportunities h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.opportunities-list {
+    display: grid;
+    gap: 15px;
+}
+
+.opportunity-card {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    border-left: 4px solid #f39c12;
+}
+
+.opportunity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.opportunity-header .test-class {
+    font-family: monospace;
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.opportunity-header .load-time {
+    background: #e74c3c;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.opportunity-details {
+    margin-bottom: 10px;
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+.opportunity-recommendation {
+    color: #34495e;
+    font-size: 14px;
+    line-height: 1.5;
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.optimization-tips {
+    margin-top: 30px;
+}
+
+.optimization-tips h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.tip-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid #3498db;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.tip-card .tip-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.tip-card h4 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.tip-card p {
+    color: #7f8c8d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.impact-analysis {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #f8f9fa 100%);
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid #27ae60;
+}
+
+.impact-analysis h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.impact-content {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.impact-metric {
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+}
+
+.impact-metric .impact-title {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.impact-metric .impact-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.no-optimization-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Responsive adjustments for optimization section */
+@media (max-width: 768px) {
+    .optimization-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .impact-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .opportunity-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* Timeline Section Styles */
+.timeline-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.timeline-section h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.timeline-summary {
+    display: flex;
+    justify-content: space-around;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 4px solid #9b59b6;
+}
+
+.timeline-metric {
+    text-align: center;
+}
+
+.timeline-metric .label {
+    display: block;
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.timeline-metric .value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.timeline-legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.legend-color.creation {
+    background-color: #e74c3c;
+}
+
+.legend-color.active {
+    background-color: #27ae60;
+}
+
+.legend-color.cached {
+    background-color: #3498db;
+}
+
+.timeline-chart-container {
+    position: relative;
+    height: 400px;
+    margin-bottom: 30px;
+    background: white;
+    border: 1px solid #ecf0f1;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.timeline-details {
+    margin-bottom: 30px;
+}
+
+.timeline-details h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.timeline-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.timeline-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.timeline-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ecf0f1;
+    font-size: 14px;
+}
+
+.timeline-table tr:last-child td {
+    border-bottom: none;
+}
+
+.timeline-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.context-name {
+    font-family: monospace;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.phase-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.phase-badge.phase-creation {
+    background-color: #fde8e8;
+    color: #e74c3c;
+}
+
+.phase-badge.phase-active {
+    background-color: #d5f4e6;
+    color: #27ae60;
+}
+
+.phase-badge.phase-cached {
+    background-color: #e8f4f8;
+    color: #3498db;
+}
+
+.time-value, .duration-value {
+    font-family: monospace;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+.details {
+    color: #34495e;
+    font-style: italic;
+}
+
+.timeline-insights {
+    background: linear-gradient(135deg, #f8f4ff 0%, #f8f9fa 100%);
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid #9b59b6;
+}
+
+.timeline-insights h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.insight-card {
+    background: white;
+    border-radius: 6px;
+    padding: 15px;
+    border-left: 4px solid #9b59b6;
+}
+
+.insight-card h4 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.insight-card p {
+    color: #7f8c8d;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.no-timeline-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Responsive adjustments for timeline section */
+@media (max-width: 768px) {
+    .timeline-legend {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .timeline-summary {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .timeline-chart-container {
+        height: 300px;
+    }
+    
+    .timeline-table {
+        font-size: 12px;
+    }
+    
+    .timeline-table th,
+    .timeline-table td {
+        padding: 8px;
+    }
+}</style>
+</head>
+<body>
+<div class="container">
+  <h1>Spring Test Profiler Report</h1>
+  <p>Understanding when and how many Spring ApplicationContexts are created in your test suite allows you to optimize
+    build times by leveraging Spring TestContext's context caching feature, which reuses already started contexts.</p>
+  <br/>
+  <div class="timestamp">Generated at: 2025-07-17 10:10:28</div>
+
+  <!-- Theory Section Fragment -->
+  <div class="theory-section">
+        <div class="theory-header" onclick="toggleTheorySection()">
+            <h2>
+                <span class="toggle-icon" id="theory-toggle-icon">▶</span>
+                Understanding Spring TestContext Context Caching
+            </h2>
+            <p class="theory-subtitle">Click to learn about Spring TestContext context caching principles and optimization tips</p>
+        </div>
+        <div class="theory-content" id="theory-content" style="display: none;">
+            <p>Spring Test Framework provides <strong>context caching</strong> to improve test performance by reusing ApplicationContext instances across multiple test classes when they share the same configuration.</p>
+
+            <h3>How Context Caching Works</h3>
+            <p>Spring generates a <strong>cache key</strong> based on:</p>
+            <ul>
+                <li><strong>Context Loader</strong> - The class responsible for loading the context</li>
+                <li><strong>Locations & Classes</strong> - Configuration files/classes specified in @ContextConfiguration</li>
+                <li><strong>Active Profiles</strong> - Profiles activated via @ActiveProfiles</li>
+                <li><strong>Property Sources</strong> - Test property sources from @TestPropertySource</li>
+                <li><strong>Context Initializers</strong> - Custom context initializers</li>
+                <li><strong>Context Customizers</strong> - Customizers from test slices like @WebMvcTest</li>
+            </ul>
+
+            <div class="cache-behavior">
+                <div class="cache-hit">
+                    <h4>🎯 Cache Hit</h4>
+                    <p>When a test class has the <em>same exact configuration</em> as a previous test, Spring reuses the existing ApplicationContext. This results in faster test execution.</p>
+                </div>
+                <div class="cache-miss">
+                    <h4>🔄 Cache Miss</h4>
+                    <p>When a test class has a <em>different configuration</em>, Spring creates a new ApplicationContext. This takes more time but ensures test isolation.</p>
+                </div>
+            </div>
+
+            <h3>Optimization Tips</h3>
+            <ul>
+                <li><strong>Group similar tests:</strong> Use the same @ContextConfiguration across related test classes</li>
+                <li><strong>Minimize @DirtiesContext:</strong> Avoid marking contexts as dirty unless absolutely necessary</li>
+                <li><strong>Use test slices:</strong> @WebMvcTest, @DataJpaTest create focused, cacheable contexts</li>
+                <li><strong>Consolidate profiles:</strong> Use consistent @ActiveProfiles across test classes</li>
+            </ul>
+
+            <div class="docs-links">
+                <h3>📚 Learn More</h3>
+                <p>For detailed information about Spring Test context caching:</p>
+                <ul>
+                    <li><a href="https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/ctx-management/caching.html" target="_blank">Context Caching - Spring Framework Reference</a></li>
+                    <li><a href="https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/support-classes.html" target="_blank">TestContext Framework Support Classes</a></li>
+                    <li><a href="https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html" target="_blank">Testing Spring Boot Applications</a></li>
+                    <li><a href="https://docs.spring.io/spring-framework/reference/testing/annotations/integration-spring/annotation-dirtiescontext.html" target="_blank">@DirtiesContext Annotation</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+  <!-- Summary Section Fragment -->
+  <div>
+        
+        <h2>Test Execution Summary</h2>
+        <div class="execution-info">
+            <div class="execution-detail">
+                <strong>Executed via:</strong> <span>maven</span>
+            </div>
+            <div class="execution-detail">
+                <strong>Execution Time:</strong> <span>2025-07-17 10:10:28</span>
+            </div>
+            <div class="execution-detail">
+                <strong>Time Zone:</strong> <span>Europe/Berlin</span>
+            </div>
+        </div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>Test Classes</h3>
+                <div class="value">11</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Tests</h3>
+                <div class="value">46</div>
+            </div>
+            <div class="summary-card passed">
+                <h3>Passed</h3>
+                <div class="value">46</div>
+            </div>
+            <div class="summary-card failed">
+                <h3>Failed</h3>
+                <div class="value">0</div>
+            </div>
+            <div class="summary-card disabled">
+                <h3>Disabled</h3>
+                <div class="value">0</div>
+            </div>
+            <div class="summary-card aborted">
+                <h3>Aborted</h3>
+                <div class="value">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Runtime</h3>
+                <div class="value" style="font-size: 24px;">1.3m</div>
+            </div>
+            <div class="summary-card">
+                <h3>Success Rate</h3>
+                <div class="value" style="font-size: 24px;">100.0%</div>
+            </div>
+        </div>
+    </div>
+
+  <!-- Context Caching Statistics Fragment -->
+  <div class="cache-stats">
+        <h2>Spring Context Caching Statistics</h2>
+        
+        <!-- Basic cache metrics -->
+        <div class="cache-overview">
+            <div class="cache-metric">
+                <span class="label">Cache Size:</span>
+                <span class="value">9 / 32</span>
+            </div>
+            <div class="cache-metric">
+                <span class="label">Cache Hits:</span>
+                <span class="value">780</span>
+            </div>
+            <div class="cache-metric">
+                <span class="label">Cache Misses:</span>
+                <span class="value">9</span>
+            </div>
+            <div class="cache-metric">
+                <span class="label">Cache Hit Rate:</span>
+                <span class="value hit-rate">98.9%</span>
+            </div>
+        </div>
+        
+        <!-- Detailed context information -->
+        <div class="context-cache-details">
+            <h3>Context Cache Entries</h3>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: -104507435</span>
+                    <span class="bean-count">469 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.PostgresIntegrationTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 1623227826</span>
+                    <span class="bean-count">339 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.system.CrashControllerIntegrationTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 71137934</span>
+                    <span class="bean-count">141 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.vet.VetControllerTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 858556821</span>
+                    <span class="bean-count">467 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.PetClinicIntegrationTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: -1835494959</span>
+                    <span class="bean-count">141 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.owner.VisitControllerTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 1041075652</span>
+                    <span class="bean-count">85 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.service.ClinicServiceTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 1539496782</span>
+                    <span class="bean-count">470 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.MySqlIntegrationTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 1017383432</span>
+                    <span class="bean-count">143 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.owner.PetControllerTests$ProcessCreationFormHasErrors, </span><span class="test-class">org.springframework.samples.petclinic.owner.PetControllerTests$ProcessUpdateFormHasErrors, </span><span class="test-class">org.springframework.samples.petclinic.owner.PetControllerTests</span>
+                </div>
+            </div>
+            <div class="cache-entry">
+                <div class="cache-entry-header">
+                    <span class="cache-id">Context ID: 1012786048</span>
+                    <span class="bean-count">141 beans</span>
+                </div>
+                <div class="test-classes">
+                    <strong>Test Classes:</strong>
+                    <span class="test-class">org.springframework.samples.petclinic.owner.OwnerControllerTests</span>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+
+  <!-- Optimization Recommendations Fragment -->
+  <!--  <div th:replace="~{fragments/optimization :: optimization-section(${optimizationStats})}"></div>-->
+
+  <!-- Timeline Visualization Fragment -->
+  <!--  <div th:replace="~{fragments/timeline :: timeline-section(${timelineData}, ${jsonHelper})}"></div>-->
+
+  <!-- Context Configurations Fragment -->
+  <div class="context-configs-section">
+  <h2>Spring Context Configurations</h2>
+  <p>This section shows all unique Spring context configurations detected during test execution, grouped by their
+    MergedContextConfiguration.</p>
+  <br/>
+
+  <div>
+    
+
+    <div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-1623227826</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">339 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[TestConfiguration]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">4 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@10dc7d6, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@c8e98e7b]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">339</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.system.CrashControllerIntegrationTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>339</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-1012786048</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">141 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">1 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@70e76d93, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@b9fcd241, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@ed778a2d, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, [ImportsContextCustomizer@4eebbf28 key = [org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientWebSecurityAutoConfiguration, org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.bean.override.BeanOverrideContextCustomizer@5a064f7a, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@fccf22c3]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">141</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.owner.OwnerControllerTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>141</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-1835494959</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">141 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">1 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@70e76d93, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@6fe42d90, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@ed778a2d, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, [ImportsContextCustomizer@5636f71b key = [org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientWebSecurityAutoConfiguration, org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.bean.override.BeanOverrideContextCustomizer@5a064f7a, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@fccf22c3]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">141</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.owner.VisitControllerTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>141</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-1041075652</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">85 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">1 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@70e76d93, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@34be3d80, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@2b20eaa4, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, [ImportsContextCustomizer@4e537dac key = [org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration, org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration, org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManagerAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration, org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration, org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration, org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration, org.springframework.boot.testcontainers.service.connection.ServiceConnectionAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration, org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.JdbcClientAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@fccf22c3]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">85</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.service.ClinicServiceTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>85</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-1539496782</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">470 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[mysql]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">2 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@f0ee29a7, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@10dc7d6, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@c8e98e7b]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">470</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.MySqlIntegrationTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>470</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-71137934</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">141 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">1 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@70e76d93, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@7a056344, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@ed778a2d, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, [ImportsContextCustomizer@32f7601 key = [org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientWebSecurityAutoConfiguration, org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.bean.override.BeanOverrideContextCustomizer@bb63229, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@fccf22c3]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">141</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.vet.VetControllerTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>141</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-1017383432</span></div>
+          <div class="context-config-test-count">3 test classes</div>
+          <div class="context-bean-count">143 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">1 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@70e76d93, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@31bae88d, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@ed778a2d, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, [ImportsContextCustomizer@2a6d0fb3 key = [org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientWebSecurityAutoConfiguration, org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.bean.override.BeanOverrideContextCustomizer@3eedfa6, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@fccf22c3]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">143</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.owner.PetControllerTests$ProcessCreationFormHasErrors</span><span class="context-test-class">org.springframework.samples.petclinic.owner.PetControllerTests$ProcessUpdateFormHasErrors</span><span class="context-test-class">org.springframework.samples.petclinic.owner.PetControllerTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>143</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-858556821</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">467 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">2 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@10dc7d6, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@c8e98e7b]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">467</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.PetClinicIntegrationTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>467</span> bean definitions
+          </div>
+        </div>
+      </div>
+      <div class="context-config-item">
+        <div class="context-config-header">
+          <div class="context-config-id">🔧 <span>config-104507435</span></div>
+          <div class="context-config-test-count">1 test class</div>
+          <div class="context-bean-count">469 beans</div>
+        </div>
+
+        <!-- Configuration details -->
+        <div class="config-details">
+          <div class="config-detail-item">
+            <div class="config-detail-key">configurationClasses:</div>
+            <div class="config-detail-value">[PetClinicApplication]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">activeProfiles:</div>
+            <div class="config-detail-value">[postgres]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextLoader:</div>
+            <div class="config-detail-value">SpringBootContextLoader</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">properties:</div>
+            <div class="config-detail-value">4 properties</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">parentContext:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextCustomizers:</div>
+            <div class="config-detail-value">[org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer@0, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@119c745c, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1000d54d, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@750ff7d3, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@a0db585, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@10dc7d6, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@17c2d509, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@c8e98e7b]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">locations:</div>
+            <div class="config-detail-value"></div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">contextInitializers:</div>
+            <div class="config-detail-value">[]</div>
+          </div>
+          <div class="config-detail-item">
+            <div class="config-detail-key">beanDefinitionCount:</div>
+            <div class="config-detail-value">469</div>
+          </div>
+        </div>
+
+        <!-- Test classes using this configuration -->
+        <div class="context-test-classes">
+          <strong>Test classes using this configuration:</strong><br>
+          <span class="context-test-class">org.springframework.samples.petclinic.PostgresIntegrationTests</span>
+        </div>
+
+        <!-- Context complexity analysis -->
+        <div class="context-complexity">
+          <div class="complexity-indicator">
+            <strong>Context Complexity:</strong>
+            <span>469</span> bean definitions
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Test Execution Details Fragment -->
+  <div>
+        <h2>Test Execution Details</h2>
+        <div class="execution-overview">
+            <p>Click on any test class below to expand and see detailed information about individual test methods, including execution times and failure details.</p>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">PetClinicIntegrationTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>453ms</span></span>
+                    <span>📊 <span>2 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>2</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testOwnerDetails</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">21ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testFindAll</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">10ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">MySqlIntegrationTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>15.7s</span></span>
+                    <span>📊 <span>2 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>2</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testOwnerDetails</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">231ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testFindAll</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">280ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">PetControllerTests$ProcessCreationFormHasErrors</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.owner</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>87ms</span></span>
+                    <span>📊 <span>5 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>5</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormWithDuplicateName</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormWithInvalidBirthDate</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testInitUpdateForm</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">5ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormWithBlankName</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormWithMissingPetType</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">OwnerControllerTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.owner</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>481ms</span></span>
+                    <span>📊 <span>13 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>13</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateOwnerFormHasErrors</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">70ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">5ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testInitUpdateOwnerForm</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessFindFormSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">10ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormHasErrors</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">5ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testInitFindForm</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">9ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateOwnerFormSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">2ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testInitCreationForm</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateOwnerFormWithIdMismatch</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">3ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessFindFormNoOwnersFound</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">6ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testShowOwner</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">18ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateOwnerFormUnchangedSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">2ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessFindFormByLastName</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">3ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">PetControllerTests$ProcessUpdateFormHasErrors</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.owner</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>47ms</span></span>
+                    <span>📊 <span>2 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>2</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateFormWithInvalidBirthDate</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">11ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateFormWithBlankName</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">7ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">VisitControllerTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.owner</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>148ms</span></span>
+                    <span>📊 <span>3 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>3</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessNewVisitFormHasErrors</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">23ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessNewVisitFormSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">2ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testInitNewVisitForm</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">4ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">CrashControllerIntegrationTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.system</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>304ms</span></span>
+                    <span>📊 <span>2 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>2</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testTriggerExceptionHtml</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">41ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testTriggerExceptionJson</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">16ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">VetControllerTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.vet</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>152ms</span></span>
+                    <span>📊 <span>2 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>2</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testShowResourcesVetList</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">16ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testShowVetListHtml</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">19ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">PostgresIntegrationTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>1.0m</span></span>
+                    <span>📊 <span>2 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>2</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testOwnerDetails</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">25ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testFindAll</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">14ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">PetControllerTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.owner</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>371ms</span></span>
+                    <span>📊 <span>3 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>3</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessCreationFormSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">5ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testProcessUpdateFormSuccess</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">3ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>testInitCreationForm</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">22ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-class">
+            
+            <div class="test-class-header" 
+                 onclick="toggleClass(this)" 
+                 style="border-left: 4px solid #27ae60;">
+                <div>
+                    <div class="test-class-name">ClinicServiceTests</div>
+                    <div class="test-class-package">org.springframework.samples.petclinic.service</div>
+                </div>
+                <div class="test-class-stats">
+                    <span>⏱️ <span>279ms</span></span>
+                    <span>📊 <span>10 tests</span></span>
+                    
+                    <span style="color: #27ae60;">
+                        ✅ <span>10</span>
+                    </span>
+                    
+                    <!-- Disabled and aborted tests would require additional counting logic -->
+                </div>
+            </div>
+            
+            <div class="test-methods">
+                <!-- Context info is now handled globally via cache statistics -->
+                
+                <!-- Test methods -->
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldUpdateOwner</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">2ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldFindVets</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">7ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldInsertOwner</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">5ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldFindAllPetTypes</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">1ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldFindVisitsByPetId</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">4ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldInsertPetIntoDatabaseAndGenerateId</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">7ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldUpdatePetName</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">2ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldFindOwnersByLastName</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">21ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldAddNewVisitForPet</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">13ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="test-method passed">
+                    
+                    <div class="test-method-header">
+                        <span class="test-method-name">
+                            <span>✅</span> 
+                            <span>shouldFindSingleOwnerWithPet</span>
+                        </span>
+                        <div class="test-method-info">
+                            <span class="test-duration">1ms</span>
+                            <span class="test-status">PASSED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>
+      Get help with optimizing your Spring Boot test suite at
+      <a href="https://pragmatech.digital" target="_blank" rel="noopener noreferrer">
+        PragmaTech GmbH
+      </a>
+    </p>
+    <p>
+      Generated on <span>2025-07-17 10:10:28</span>
+      by <strong>Spring Test Profiler</strong>
+      <span>0.0.5</span>
+    </p>
+    <p>
+      <a href="https://github.com/PragmaTech-GmbH/spring-test-profiler" target="_blank"
+         rel="noopener noreferrer">GitHub</a>
+      |
+      <a href="https://pragmatech.digital/products/" target="_blank" rel="noopener noreferrer">Documentation</a>
+      |
+      <a href="https://github.com/PragmaTech-GmbH/spring-test-profiler/issues" target="_blank"
+         rel="noopener noreferrer">Submit a Bug or Feature Request</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  function toggleClass(element) {
+    const methods = element.nextElementSibling;
+    methods.classList.toggle('show');
+  }
+
+  function toggleTheorySection() {
+    const content = document.getElementById('theory-content');
+    const icon = document.getElementById('theory-toggle-icon');
+
+    if (content.style.display === 'none') {
+      content.style.display = 'block';
+      icon.textContent = '▼';
+      icon.classList.add('expanded');
+    } else {
+      content.style.display = 'none';
+      icon.textContent = '▶';
+      icon.classList.remove('expanded');
+    }
+  }
+</script>
+</body>
+</html>

@@ -111,6 +111,9 @@ After test execution, find the HTML report at:
 
 Download and view a sample report to see the profiler in action:
 
+![Demo Report](docs/spring-test-profiler-report-sample.png)
+
+Read the full report [here](docs/test-profiler-report-pet-clinic-2025-07-latest.html).
 
 ## Bug Reports
 
