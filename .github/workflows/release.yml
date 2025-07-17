@@ -65,7 +65,7 @@ jobs:
           arguments: 'deploy --git-root-search'
           version: 1.19.0
         env:
-          JRELEASER_PROJECT_VERSION: $RELEASE_VERSION
+          JRELEASER_PROJECT_VERSION: ${{ env.RELEASE_VERSION }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.MAVEN_GPG_PUBLIC_KEY }}
@@ -82,12 +82,12 @@ jobs:
           if-no-files-found: warn
 
       - name: Update versions after release
-        run: ./scripts/update-versions.sh "$RELEASE_VERSION" "$NEXT_DEV_VERSION"
+        run: ./scripts/update-versions.sh "${{ env.RELEASE_VERSION }}" "${{ env.NEXT_DEV_VERSION }}"
 
       - name: Commit & Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "prepare for next development version $NEXT_DEV_VERSION"
+          git commit -m "prepare for next development version ${{ env.NEXT_DEV_VERSION }}"
           git push
