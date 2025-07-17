@@ -39,7 +39,7 @@ jobs:
         uses: jreleaser/release-action@v2
         with:
           arguments: 'full-release --git-root-search'
-          version: 1.14.0
+          version: 1.19.0
         env:
           JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

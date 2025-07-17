@@ -107,8 +107,9 @@ After test execution, find the HTML report at:
 - Maven: `target/spring-test-profiler/latest.html`
 - Gradle: `build/spring-test-profiler/latest.html`
 
-### Demo Report
+## Demo Report
 
+Download and view a sample report to see the profiler in action:
 
 
 ## Bug Reports
