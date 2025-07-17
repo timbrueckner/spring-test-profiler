@@ -85,8 +85,9 @@ jobs:
         run: ./scripts/update-versions.sh "$RELEASE_VERSION" "$NEXT_DEV_VERSION"
 
       - name: Commit & Push changes
-        uses: actions-js/push@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          message: prepare for next development version $NEXT_DEV_VERSION
-          tags: true
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "prepare for next development version $NEXT_DEV_VERSION"
+          git push
