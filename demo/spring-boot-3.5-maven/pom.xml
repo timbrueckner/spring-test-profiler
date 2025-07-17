@@ -14,10 +14,10 @@
 
   <groupId>digital.pragmatech</groupId>
   <artifactId>spring-test-profiler-demo-spring-boot-3.5-maven</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <packaging>jar</packaging>
 
-  <name>Spring Test Insight Demo</name>
+  <name>Spring Test Insight Demo - Spring Boot 3.5</name>
   <description>Demo project for Spring Profiler Insight Extension</description>
 
   <properties>
@@ -55,9 +55,9 @@
 
     <!-- Spring Test Insight Extension -->
     <dependency>
-      <groupId>digital.pragmatech</groupId>
-      <artifactId>spring-test-profiler-extension</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <groupId>digital.pragmatech.testing</groupId>
+      <artifactId>spring-test-profiler</artifactId>
+      <version>0.0.3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

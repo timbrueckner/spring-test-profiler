@@ -14,7 +14,7 @@
 
   <groupId>digital.pragmatech</groupId>
   <artifactId>spring-test-profiler-demo-junit-parallel</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <packaging>jar</packaging>
 
   <name>Spring Test Insight Demo - JUnit Parallel</name>
@@ -55,9 +55,9 @@
 
     <!-- Spring Test Insight Extension -->
     <dependency>
-      <groupId>digital.pragmatech</groupId>
-      <artifactId>spring-test-profiler-extension</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <groupId>digital.pragmatech.testing</groupId>
+      <artifactId>spring-test-profiler</artifactId>
+      <version>0.0.3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
