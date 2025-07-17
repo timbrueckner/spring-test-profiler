@@ -30,10 +30,13 @@ echo "📝 Updating main pom.xml to next development version..."
 ./mvnw --batch-mode versions:set -DnewVersion="$NEXT_DEV_VERSION"
 echo "✅ Updated main pom.xml to $NEXT_DEV_VERSION"
 
-# Update demo Maven projects
+# Update demo Maven projects (only spring-test-profiler dependency)
 echo "📝 Updating demo Maven projects..."
-find demo -name "pom.xml" -exec sed -i "" "s/<version>[0-9]*\.[0-9]*\.[0-9]*\(-SNAPSHOT\)\{0,1\}<\/version>/<version>$NEXT_DEV_VERSION<\/version>/" {} \;
-echo "✅ Updated demo Maven projects to $NEXT_DEV_VERSION"
+for pom in $(find demo -name "pom.xml"); do
+  # Use perl for multiline matching to target only spring-test-profiler dependency
+  perl -i -pe 'BEGIN{undef $/;} s|(<groupId>digital\.pragmatech\.testing</groupId>\s*<artifactId>spring-test-profiler</artifactId>\s*)<version>[0-9]*\.[0-9]*\.[0-9]*(-SNAPSHOT)?</version>|${1}<version>'"$NEXT_DEV_VERSION"'</version>|smg' "$pom"
+done
+echo "✅ Updated demo Maven projects spring-test-profiler dependency to $NEXT_DEV_VERSION"
 
 # Update demo Gradle projects
 echo "📝 Updating demo Gradle projects..."
