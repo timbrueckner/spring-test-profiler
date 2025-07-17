@@ -6,7 +6,7 @@
 
   <groupId>digital.pragmatech.testing</groupId>
   <artifactId>spring-test-profiler</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.4</version>
 
   <name>Spring Test Profiler</name>
   <description>Spring Test insights and context caching visualization</description>
