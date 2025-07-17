@@ -92,6 +92,6 @@ jobs:
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
-          github_token: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           message: prepare for next development version $NEXT_DEV_VERSION
           tags: true
