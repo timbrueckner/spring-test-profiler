@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class BookServiceIT {
+class BookServiceIT {
 
   @Autowired
   private BookService bookService;
