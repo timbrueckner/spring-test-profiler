@@ -48,17 +48,6 @@ jobs:
           fi
           echo "✅ pom.xml version validation passed: $POM_VERSION"
 
-      - name: Validate JReleaser version
-        run: |
-          JRELEASER_VERSION=$(grep '^  version:' jreleaser.yml | sed 's/.*version: \(.*\)/\1/')
-          if [ "$JRELEASER_VERSION" != "${{ github.event.inputs.version }}" ]; then
-            echo "❌ Error: jreleaser.yml version does not match release version!"
-            echo "jreleaser.yml version: $JRELEASER_VERSION"
-            echo "Release version: ${{ github.event.inputs.version }}"
-            exit 1
-          fi
-          echo "✅ jreleaser.yml version validation passed: $JRELEASER_VERSION"
-
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -93,9 +82,6 @@ jobs:
 
       - name: Set next development version in pom.xml
         run: ./mvnw --batch-mode versions:set -DnewVersion=$NEXT_DEV_VERSION
-
-      - name: Update JReleaser project.version
-        run: 'sed -i "" "3s/version: .*/version: $NEXT_DEV_VERSION/" jreleaser.yml'
 
       - name: Update demo Maven projects
         run: find demo -name "pom.xml" -exec sed -i "" "s/<version>[0-9]*\.[0-9]*\.[0-9]*\(-SNAPSHOT\)\{0,1\}<\/version>/<version>$NEXT_DEV_VERSION<\/version>/" {} \;

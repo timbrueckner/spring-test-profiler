@@ -1,6 +1,7 @@
 project:
   name: spring-test-profiler
-  version: 0.0.3
+  # Version is set via GitHub workflow inputs as JRELEASER_PROJECT_VERSION
+#  version: 0.0.3
   description: JUnit Jupiter extension for Spring Test insights and context caching visualization
   longDescription: Spring Test Insight is a JUnit Jupiter extension that provides detailed insights
     into Spring Test execution, focusing on context caching statistics and performance optimization.
@@ -13,7 +14,7 @@ project:
     homepage: https://github.com/PragmaTech-GmbH/spring-test-profiler
   languages:
     java:
-      version: '21'
+      version: '17'
       groupId: 'digital.pragmatech.testing'
       artifactId: 'spring-test-profiler'
   inceptionYear: '2025'
