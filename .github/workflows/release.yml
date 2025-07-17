@@ -25,6 +25,40 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Validate input versions
+        run: |
+          if [ "${{ github.event.inputs.version }}" = "${{ github.event.inputs.nextVersion }}" ]; then
+            echo "❌ Error: Release version and next version cannot be the same!"
+            echo "Release version: ${{ github.event.inputs.version }}"
+            echo "Next version: ${{ github.event.inputs.nextVersion }}"
+            exit 1
+          fi
+          echo "✅ Version validation passed"
+          echo "Release version: ${{ github.event.inputs.version }}"
+          echo "Next version: ${{ github.event.inputs.nextVersion }}"
+
+      - name: Validate pom.xml version
+        run: |
+          POM_VERSION=$(grep -m1 '<version>' pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          if [ "$POM_VERSION" != "${{ github.event.inputs.version }}" ]; then
+            echo "❌ Error: pom.xml version does not match release version!"
+            echo "pom.xml version: $POM_VERSION"
+            echo "Release version: ${{ github.event.inputs.version }}"
+            exit 1
+          fi
+          echo "✅ pom.xml version validation passed: $POM_VERSION"
+
+      - name: Validate jreleaser.yml version
+        run: |
+          JRELEASER_VERSION=$(grep '^  version:' jreleaser.yml | sed 's/.*version: \(.*\)/\1/')
+          if [ "$JRELEASER_VERSION" != "${{ github.event.inputs.version }}" ]; then
+            echo "❌ Error: jreleaser.yml version does not match release version!"
+            echo "jreleaser.yml version: $JRELEASER_VERSION"
+            echo "Release version: ${{ github.event.inputs.version }}"
+            exit 1
+          fi
+          echo "✅ jreleaser.yml version validation passed: $JRELEASER_VERSION"
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
