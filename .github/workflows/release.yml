@@ -17,6 +17,7 @@ jobs:
       contents: write
       packages: write
     env:
+      RELEASE_VERSION: ${{ github.event.inputs.version }}
       NEXT_DEV_VERSION: ${{ github.event.inputs.nextVersion }}-SNAPSHOT
 
     steps:
@@ -27,23 +28,23 @@ jobs:
 
       - name: Validate input versions
         run: |
-          if [ "${{ github.event.inputs.version }}" = "${{ github.event.inputs.nextVersion }}" ]; then
+          if [ "$RELEASE_VERSION" = "${{ github.event.inputs.nextVersion }}" ]; then
             echo "❌ Error: Release version and next version cannot be the same!"
-            echo "Release version: ${{ github.event.inputs.version }}"
+            echo "Release version: $RELEASE_VERSION"
             echo "Next version: ${{ github.event.inputs.nextVersion }}"
             exit 1
           fi
           echo "✅ Version validation passed"
-          echo "Release version: ${{ github.event.inputs.version }}"
+          echo "Release version: $RELEASE_VERSION"
           echo "Next version: ${{ github.event.inputs.nextVersion }}"
 
       - name: Validate Maven version
         run: |
           POM_VERSION=$(grep -m1 '<version>' pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
-          if [ "$POM_VERSION" != "${{ github.event.inputs.version }}" ]; then
+          if [ "$POM_VERSION" != "$RELEASE_VERSION" ]; then
             echo "❌ Error: pom.xml version does not match release version!"
             echo "pom.xml version: $POM_VERSION"
-            echo "Release version: ${{ github.event.inputs.version }}"
+            echo "Release version: $RELEASE_VERSION"
             exit 1
           fi
           echo "✅ pom.xml version validation passed: $POM_VERSION"
@@ -61,10 +62,10 @@ jobs:
       - name: Run JReleaser
         uses: jreleaser/release-action@v2
         with:
-          arguments: 'full-release --git-root-search'
+          arguments: 'deploy --git-root-search'
           version: 1.19.0
         env:
-          JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
+          JRELEASER_PROJECT_VERSION: $RELEASE_VERSION
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.MAVEN_GPG_PUBLIC_KEY }}
@@ -80,14 +81,8 @@ jobs:
           path: out/jreleaser/trace.log
           if-no-files-found: warn
 
-      - name: Set next development version in pom.xml
-        run: ./mvnw --batch-mode versions:set -DnewVersion=$NEXT_DEV_VERSION
-
-      - name: Update demo Maven projects
-        run: find demo -name "pom.xml" -exec sed -i "" "s/<version>[0-9]*\.[0-9]*\.[0-9]*\(-SNAPSHOT\)\{0,1\}<\/version>/<version>$NEXT_DEV_VERSION<\/version>/" {} \;
-
-      - name: Update demo Gradle projects
-        run: find demo -name "build.gradle" -exec sed -i "" "s/digital.pragmatech.testing:spring-test-profiler:[^']*/digital.pragmatech.testing:spring-test-profiler:$NEXT_DEV_VERSION/" {} \;
+      - name: Update versions after release
+        run: ./scripts/update-versions.sh "$RELEASE_VERSION" "$NEXT_DEV_VERSION"
 
       - name: Commit & Push changes
         uses: actions-js/push@master
