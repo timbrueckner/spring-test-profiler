@@ -20,9 +20,18 @@ echo "Next dev version: $NEXT_DEV_VERSION"
 
 # Update README.md with release version
 echo "📝 Updating README.md with release version..."
-sed -i "" "s/Latest%20Version-[0-9]*\.[0-9]*\.[0-9]*/Latest%20Version-$RELEASE_VERSION/" README.md
-sed -i "" "s/<version>[0-9]*\.[0-9]*\.[0-9]*<\/version>/<version>$RELEASE_VERSION<\/version>/" README.md
-sed -i "" "s/spring-test-profiler:[0-9]*\.[0-9]*\.[0-9]*/spring-test-profiler:$RELEASE_VERSION/" README.md
+# Use cross-platform sed approach
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  sed -i "" "s/Latest%20Version-[0-9]*\.[0-9]*\.[0-9]*/Latest%20Version-$RELEASE_VERSION/" README.md
+  sed -i "" "s/<version>[0-9]*\.[0-9]*\.[0-9]*<\/version>/<version>$RELEASE_VERSION<\/version>/" README.md
+  sed -i "" "s/spring-test-profiler:[0-9]*\.[0-9]*\.[0-9]*/spring-test-profiler:$RELEASE_VERSION/" README.md
+else
+  # Linux
+  sed -i "s/Latest%20Version-[0-9]*\.[0-9]*\.[0-9]*/Latest%20Version-$RELEASE_VERSION/" README.md
+  sed -i "s/<version>[0-9]*\.[0-9]*\.[0-9]*<\/version>/<version>$RELEASE_VERSION<\/version>/" README.md
+  sed -i "s/spring-test-profiler:[0-9]*\.[0-9]*\.[0-9]*/spring-test-profiler:$RELEASE_VERSION/" README.md
+fi
 echo "✅ Updated README.md with release version $RELEASE_VERSION"
 
 # Set next development version in main pom.xml
@@ -40,7 +49,13 @@ echo "✅ Updated demo Maven projects spring-test-profiler dependency to $NEXT_D
 
 # Update demo Gradle projects
 echo "📝 Updating demo Gradle projects..."
-find demo -name "build.gradle" -exec sed -i "" "s/digital.pragmatech.testing:spring-test-profiler:[^']*/digital.pragmatech.testing:spring-test-profiler:$NEXT_DEV_VERSION/" {} \;
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  find demo -name "build.gradle" -exec sed -i "" "s/digital.pragmatech.testing:spring-test-profiler:[^']*/digital.pragmatech.testing:spring-test-profiler:$NEXT_DEV_VERSION/" {} \;
+else
+  # Linux
+  find demo -name "build.gradle" -exec sed -i "s/digital.pragmatech.testing:spring-test-profiler:[^']*/digital.pragmatech.testing:spring-test-profiler:$NEXT_DEV_VERSION/" {} \;
+fi
 echo "✅ Updated demo Gradle projects to $NEXT_DEV_VERSION"
 
 echo "🎉 All version updates completed successfully!"
