@@ -6,9 +6,7 @@ import org.springframework.test.context.cache.ContextCacheUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Simple test to verify that ContextCacheUtils.retrieveMaxCacheSize() works as expected.
- */
+/** Simple test to verify that ContextCacheUtils.retrieveMaxCacheSize() works as expected. */
 class MaxCacheSizeVerificationTest {
 
   @Test

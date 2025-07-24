@@ -26,8 +26,7 @@ public class BuildToolDetection {
   private static BuildTool detectBuildTool() {
     try {
       throw new RuntimeException("Build Tool Detection");
-    }
-    catch (RuntimeException e) {
+    } catch (RuntimeException e) {
       String stackTrace = Arrays.toString(e.getStackTrace());
 
       if (stackTrace.contains("org.apache.maven")) {

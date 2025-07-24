@@ -17,8 +17,8 @@ import org.springframework.test.context.TestContextBootstrapper;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 /**
- * Spring TestExecutionListener that tracks test execution and context cache usage.
- * This listener runs with highest precedence to capture context loading before Spring's own listeners.
+ * Spring TestExecutionListener that tracks test execution and context cache usage. This listener
+ * runs with highest precedence to capture context loading before Spring's own listeners.
  */
 public class SpringTestProfilerListener extends AbstractTestExecutionListener {
 
@@ -94,7 +94,8 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
     if (className != null) {
       try {
         Class<?> testClass = testContext.getTestClass();
-        TestContextBootstrapper bootstrapper = BootstrapUtils.resolveTestContextBootstrapper(testClass);
+        TestContextBootstrapper bootstrapper =
+            BootstrapUtils.resolveTestContextBootstrapper(testClass);
         MergedContextConfiguration mergedConfig = bootstrapper.buildMergedContextConfiguration();
         int cacheKey = mergedConfig.hashCode();
 
@@ -102,20 +103,29 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
         Instant contextLoadStartTime = contextLoadStartTimes.get(testContext);
         long contextLoadDurationMs = 0;
         if (contextLoadStartTime != null) {
-          contextLoadDurationMs = java.time.Duration.between(contextLoadStartTime, contextLoadEndTime).toMillis();
+          contextLoadDurationMs =
+              java.time.Duration.between(contextLoadStartTime, contextLoadEndTime).toMillis();
         }
 
         // Try to get enhanced profile data from ApplicationContextInitializer
         ContextProfileData profileData = null;
-        if (testContext.getApplicationContext() instanceof org.springframework.context.ConfigurableApplicationContext) {
-          profileData = TimingTrackingApplicationContextInitializer
-            .getContextProfileData((org.springframework.context.ConfigurableApplicationContext) testContext.getApplicationContext());
+        if (testContext.getApplicationContext()
+            instanceof org.springframework.context.ConfigurableApplicationContext) {
+          profileData =
+              TimingTrackingApplicationContextInitializer.getContextProfileData(
+                  (org.springframework.context.ConfigurableApplicationContext)
+                      testContext.getApplicationContext());
         }
 
         if (profileData != null) {
-          logger.debug("Enhanced context profiling available for test class {} - Total time: {}ms, Memory: {}MB, Beans: {}",
-            className, profileData.getTotalLoadTimeMs(), profileData.getMemoryUsedMB(),
-            profileData.getBeanCreationMetrics() != null ? profileData.getBeanCreationMetrics().getTotalBeansCreated() : "unknown");
+          logger.debug(
+              "Enhanced context profiling available for test class {} - Total time: {}ms, Memory: {}MB, Beans: {}",
+              className,
+              profileData.getTotalLoadTimeMs(),
+              profileData.getMemoryUsedMB(),
+              profileData.getBeanCreationMetrics() != null
+                  ? profileData.getBeanCreationMetrics().getTotalBeansCreated()
+                  : "unknown");
         }
 
         // Now check if this was a cache hit or miss
@@ -123,24 +133,25 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
         Optional<ContextCacheEntry> entry = contextCacheTracker.getCacheEntry(mergedConfig);
         if (entry.isPresent() && entry.get().isCreated()) {
           contextCacheTracker.recordContextCacheHit(mergedConfig);
-          logger.debug("Context cache hit for test class {} ({}ms)", className, contextLoadDurationMs);
-        }
-        else {
+          logger.debug(
+              "Context cache hit for test class {} ({}ms)", className, contextLoadDurationMs);
+        } else {
           contextCacheTracker.recordContextCreation(mergedConfig, contextLoadDurationMs);
 
           // Capture bean definitions for context complexity analysis
 
           String[] beanNames = testContext.getApplicationContext().getBeanDefinitionNames();
           contextCacheTracker.recordBeanDefinitions(mergedConfig, beanNames);
-          logger.debug("New context created for test class {} with {} bean definitions ({}ms)",
-            className, beanNames.length, contextLoadDurationMs);
-
+          logger.debug(
+              "New context created for test class {} with {} bean definitions ({}ms)",
+              className,
+              beanNames.length,
+              contextLoadDurationMs);
         }
-      }
-      catch (Exception e) {
-        logger.warn("Failed to track context loading for test class {}: {}", className, e.getMessage());
-      }
-      finally {
+      } catch (Exception e) {
+        logger.warn(
+            "Failed to track context loading for test class {}: {}", className, e.getMessage());
+      } finally {
         // Clean up context load timing
         contextLoadStartTimes.remove(testContext);
       }
@@ -169,7 +180,8 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
       methodStartTimes.put(testContext, Instant.now());
 
       // Record which test method uses this context
-      Optional<MergedContextConfiguration> config = contextCacheTracker.getContextForTestClass(className);
+      Optional<MergedContextConfiguration> config =
+          contextCacheTracker.getContextForTestClass(className);
       if (config.isPresent()) {
         contextCacheTracker.recordTestMethodForContext(config.get(), className, methodName);
       }
@@ -196,8 +208,8 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
       Throwable exception = testContext.getTestException();
 
       // Check for test abortion (AssumptionViolatedException or similar)
-      if (exception.getClass().getSimpleName().contains("AssumptionViolated") ||
-        exception.getClass().getSimpleName().contains("TestAborted")) {
+      if (exception.getClass().getSimpleName().contains("AssumptionViolated")
+          || exception.getClass().getSimpleName().contains("TestAborted")) {
         return TestStatus.ABORTED;
       }
 
@@ -207,14 +219,16 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   /**
-   * Registers a shutdown hook to ensure report generation when JVM exits.
-   * This is called once when the first test class is processed.
+   * Registers a shutdown hook to ensure report generation when JVM exits. This is called once when
+   * the first test class is processed.
    */
   private static void registerShutdownHook() {
     if (!shutdownHookRegistered) {
       synchronized (SpringTestProfilerListener.class) {
         if (!shutdownHookRegistered) {
-          Runtime.getRuntime().addShutdownHook(new Thread(() -> generateReport(), "SpringTestProfilerReportGenerator"));
+          Runtime.getRuntime()
+              .addShutdownHook(
+                  new Thread(() -> generateReport(), "SpringTestProfilerReportGenerator"));
           shutdownHookRegistered = true;
           logger.debug("Registered shutdown hook for Spring Test Profiler report generation");
         }
@@ -222,9 +236,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
     }
   }
 
-  /**
-   * Called by the shutdown hook or manually to generate the final report.
-   */
+  /** Called by the shutdown hook or manually to generate the final report. */
   public static void generateReport() {
     synchronized (SpringTestProfilerListener.class) {
       if (!reportGenerated) {
@@ -232,8 +244,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
         executionTracker.stopTracking();
 
         // Get context cache statistics including our custom tracking
-        SpringContextCacheAccessor.CacheStatistics springStats =
-          getCacheStatistics();
+        SpringContextCacheAccessor.CacheStatistics springStats = getCacheStatistics();
 
         // Generate report with both execution and context cache data
         reporter.generateReport(executionTracker, springStats, contextCacheTracker);
@@ -245,9 +256,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
     }
   }
 
-  /**
-   * Gets the Spring ContextCache if available.
-   */
+  /** Gets the Spring ContextCache if available. */
   public static org.springframework.test.context.cache.ContextCache getContextCache() {
     TestContext context = lastTestContext.get();
     if (context != null) {
@@ -256,9 +265,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
     return null;
   }
 
-  /**
-   * Gets cache statistics from Spring's DefaultContextCache.
-   */
+  /** Gets cache statistics from Spring's DefaultContextCache. */
   public static SpringContextCacheAccessor.CacheStatistics getCacheStatistics() {
     org.springframework.test.context.cache.ContextCache cache = getContextCache();
     return SpringContextCacheAccessor.getCacheStatistics(cache);

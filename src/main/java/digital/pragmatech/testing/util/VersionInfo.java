@@ -15,8 +15,7 @@ public class VersionInfo {
   static {
     try (InputStream is = VersionInfo.class.getResourceAsStream("/version.properties")) {
       props.load(is);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       LOG.warn("Failed to load version.properties file", e);
       props.setProperty("version", "unknown");
     }

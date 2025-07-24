@@ -22,7 +22,8 @@ class SpringContextCacheAccessorTest {
   @Test
   void shouldCreateCacheStatisticsWithMaxSize() {
     // When
-    SpringContextCacheAccessor.CacheStatistics stats = SpringContextCacheAccessor.getCacheStatistics(null);
+    SpringContextCacheAccessor.CacheStatistics stats =
+        SpringContextCacheAccessor.getCacheStatistics(null);
 
     // Then
     assertNotNull(stats);
@@ -35,7 +36,8 @@ class SpringContextCacheAccessorTest {
   @Test
   void shouldIncludeMaxSizeInToString() {
     // When
-    SpringContextCacheAccessor.CacheStatistics stats = SpringContextCacheAccessor.getCacheStatistics(null);
+    SpringContextCacheAccessor.CacheStatistics stats =
+        SpringContextCacheAccessor.getCacheStatistics(null);
     String toString = stats.toString();
 
     // Then

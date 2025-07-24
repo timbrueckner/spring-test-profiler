@@ -45,11 +45,8 @@ class TestClassExecutionDataTest {
 
   @Test
   void testConstructorAndGetters() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals("com.example.TestClass", classData.className());
     assertEquals(testExecutions, classData.testExecutions());
@@ -58,66 +55,49 @@ class TestClassExecutionDataTest {
 
   @Test
   void testTotalTestsCount() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals(5, classData.getTotalTests());
   }
 
   @Test
   void testPassedTestsCount() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals(2, classData.getPassedTests());
   }
 
   @Test
   void testFailedTestsCount() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals(1, classData.getFailedTests());
   }
 
   @Test
   void testDisabledTestsCount() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals(1, classData.getDisabledTests());
   }
 
   @Test
   void testAbortedTestsCount() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals(1, classData.getAbortedTests());
   }
 
   @Test
   void testEmptyTestExecutions() {
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.EmptyTestClass",
-      new HashMap<>(),
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData(
+            "com.example.EmptyTestClass", new HashMap<>(), contextStatistics);
 
     assertEquals(0, classData.getTotalTests());
     assertEquals(0, classData.getPassedTests());
@@ -132,11 +112,8 @@ class TestClassExecutionDataTest {
     contextStatistics.recordContextLoad("test-context", java.time.Duration.ofMillis(1000));
     contextStatistics.recordCacheHit("test-context");
 
-    TestClassExecutionData classData = new TestClassExecutionData(
-      "com.example.TestClass",
-      testExecutions,
-      contextStatistics
-    );
+    TestClassExecutionData classData =
+        new TestClassExecutionData("com.example.TestClass", testExecutions, contextStatistics);
 
     assertEquals(1, classData.contextStatistics().getContextLoads());
     assertEquals(1, classData.contextStatistics().getCacheHits());

@@ -1,4 +1,3 @@
-
 package digital.pragmatech.testing.reporting.json;
 
 import java.io.IOException;
@@ -28,9 +27,11 @@ public class JsonReportGenerator {
     this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
   }
 
-  public void generateJsonReport(Path reportDir, TestExecutionTracker executionTracker,
-    SpringContextCacheAccessor.CacheStatistics cacheStats,
-    ContextCacheTracker contextCacheTracker) {
+  public void generateJsonReport(
+      Path reportDir,
+      TestExecutionTracker executionTracker,
+      SpringContextCacheAccessor.CacheStatistics cacheStats,
+      ContextCacheTracker contextCacheTracker) {
     try {
       Files.createDirectories(reportDir);
 
@@ -44,15 +45,13 @@ public class JsonReportGenerator {
 
       logger.info("Successfully generated JSON report: {}", jsonFile.toAbsolutePath());
 
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       logger.error("Failed to generate JSON report", e);
     }
   }
 
   private record ReportData(
-    TestExecutionTracker executionTracker,
-    SpringContextCacheAccessor.CacheStatistics cacheStats,
-    ContextCacheTracker contextCacheTracker) {
-  }
+      TestExecutionTracker executionTracker,
+      SpringContextCacheAccessor.CacheStatistics cacheStats,
+      ContextCacheTracker contextCacheTracker) {}
 }

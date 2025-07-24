@@ -9,36 +9,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import digital.pragmatech.testing.ContextCacheTracker;
-import digital.pragmatech.testing.ContextCacheEntry;
-import digital.pragmatech.testing.TimelineData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import digital.pragmatech.testing.ContextCacheEntry;
+import digital.pragmatech.testing.ContextCacheTracker;
 import digital.pragmatech.testing.SpringContextStatistics;
 import digital.pragmatech.testing.TestExecutionTracker;
 import digital.pragmatech.testing.TestStatus;
+import digital.pragmatech.testing.TimelineData;
 
-/**
- * Helper classes for Thymeleaf templates to format data and provide utility methods.
- */
+/** Helper classes for Thymeleaf templates to format data and provide utility methods. */
 public class TemplateHelpers {
 
-  /**
-   * Static helper method to count tests by status from the execution tracker.
-   */
-  public static long countTestsByStatus(Map<String, TestExecutionTracker.TestClassMetrics> classMetrics, String statusName) {
+  /** Static helper method to count tests by status from the execution tracker. */
+  public static long countTestsByStatus(
+      Map<String, TestExecutionTracker.TestClassMetrics> classMetrics, String statusName) {
     TestStatus status = TestStatus.valueOf(statusName);
     return classMetrics.values().stream()
-      .flatMap(classMetric -> classMetric.getMethodMetrics().values().stream())
-      .filter(methodMetric -> methodMetric.getStatus() == status)
-      .count();
+        .flatMap(classMetric -> classMetric.getMethodMetrics().values().stream())
+        .filter(methodMetric -> methodMetric.getStatus() == status)
+        .count();
   }
 
-  /**
-   * Instance helper class for counting test statuses (to be used in templates).
-   */
+  /** Instance helper class for counting test statuses (to be used in templates). */
   public static class TestStatusCounter {
-    public long countTestsByStatus(Map<String, TestExecutionTracker.TestClassMetrics> classMetrics, String statusName) {
+    public long countTestsByStatus(
+        Map<String, TestExecutionTracker.TestClassMetrics> classMetrics, String statusName) {
       return TemplateHelpers.countTestsByStatus(classMetrics, statusName);
     }
   }
@@ -47,11 +43,9 @@ public class TemplateHelpers {
     public String format(long millis) {
       if (millis < 1000) {
         return millis + "ms";
-      }
-      else if (millis < 60000) {
+      } else if (millis < 60000) {
         return String.format("%.1fs", millis / 1000.0);
-      }
-      else {
+      } else {
         return String.format("%.1fm", millis / 60000.0);
       }
     }
@@ -73,14 +67,11 @@ public class TemplateHelpers {
     public String getClassStatusColor(TestClassExecutionData classData) {
       if (classData.getFailedTests() > 0) {
         return "#e74c3c"; // red for any failures
-      }
-      else if (classData.getAbortedTests() > 0) {
+      } else if (classData.getAbortedTests() > 0) {
         return "#f39c12"; // orange for aborted
-      }
-      else if (classData.getDisabledTests() > 0 && classData.getPassedTests() == 0) {
+      } else if (classData.getDisabledTests() > 0 && classData.getPassedTests() == 0) {
         return "#95a5a6"; // gray for all disabled
-      }
-      else {
+      } else {
         return "#27ae60"; // green for all passed
       }
     }
@@ -133,26 +124,27 @@ public class TemplateHelpers {
   public static class TestMethodSorter {
     public List<TestExecutionData> sortTestMethods(Collection<TestExecutionData> testMethods) {
       return testMethods.stream()
-        .sorted((a, b) -> {
-          // Failed tests first
-          if (a.getStatus() == TestStatus.FAILED && b.getStatus() != TestStatus.FAILED) {
-            return -1;
-          }
-          if (b.getStatus() == TestStatus.FAILED && a.getStatus() != TestStatus.FAILED) {
-            return 1;
-          }
-          // Then by name
-          return a.getTestMethodName().compareTo(b.getTestMethodName());
-        })
-        .collect(Collectors.toList());
+          .sorted(
+              (a, b) -> {
+                // Failed tests first
+                if (a.getStatus() == TestStatus.FAILED && b.getStatus() != TestStatus.FAILED) {
+                  return -1;
+                }
+                if (b.getStatus() == TestStatus.FAILED && a.getStatus() != TestStatus.FAILED) {
+                  return 1;
+                }
+                // Then by name
+                return a.getTestMethodName().compareTo(b.getTestMethodName());
+              })
+          .collect(Collectors.toList());
     }
   }
 
   public static class TestClassSorter {
     public List<TestClassExecutionData> sortTestClasses(List<TestClassExecutionData> testClasses) {
       return testClasses.stream()
-        .sorted((a, b) -> a.className().compareTo(b.className()))
-        .collect(Collectors.toList());
+          .sorted((a, b) -> a.className().compareTo(b.className()))
+          .collect(Collectors.toList());
     }
   }
 
@@ -165,48 +157,38 @@ public class TemplateHelpers {
 
   public static class SummaryCalculator {
     public long getTotalTests(List<TestClassExecutionData> testClassData) {
-      return testClassData.stream()
-        .mapToLong(TestClassExecutionData::getTotalTests)
-        .sum();
+      return testClassData.stream().mapToLong(TestClassExecutionData::getTotalTests).sum();
     }
 
     public long getPassedTests(List<TestClassExecutionData> testClassData) {
-      return testClassData.stream()
-        .mapToLong(TestClassExecutionData::getPassedTests)
-        .sum();
+      return testClassData.stream().mapToLong(TestClassExecutionData::getPassedTests).sum();
     }
 
     public long getFailedTests(List<TestClassExecutionData> testClassData) {
-      return testClassData.stream()
-        .mapToLong(TestClassExecutionData::getFailedTests)
-        .sum();
+      return testClassData.stream().mapToLong(TestClassExecutionData::getFailedTests).sum();
     }
 
     public long getDisabledTests(List<TestClassExecutionData> testClassData) {
-      return testClassData.stream()
-        .mapToLong(TestClassExecutionData::getDisabledTests)
-        .sum();
+      return testClassData.stream().mapToLong(TestClassExecutionData::getDisabledTests).sum();
     }
 
     public long getAbortedTests(List<TestClassExecutionData> testClassData) {
-      return testClassData.stream()
-        .mapToLong(TestClassExecutionData::getAbortedTests)
-        .sum();
+      return testClassData.stream().mapToLong(TestClassExecutionData::getAbortedTests).sum();
     }
 
     public long getTotalExecutionTime(List<TestClassExecutionData> testClassData) {
       return testClassData.stream()
-        .flatMap(classData -> classData.testExecutions().values().stream())
-        .filter(testData -> testData.getDuration() != null)
-        .mapToLong(testData -> testData.getDuration().toMillis())
-        .sum();
+          .flatMap(classData -> classData.testExecutions().values().stream())
+          .filter(testData -> testData.getDuration() != null)
+          .mapToLong(testData -> testData.getDuration().toMillis())
+          .sum();
     }
 
     public long getClassExecutionTime(TestClassExecutionData classData) {
       return classData.testExecutions().values().stream()
-        .filter(testData -> testData.getDuration() != null)
-        .mapToLong(testData -> testData.getDuration().toMillis())
-        .sum();
+          .filter(testData -> testData.getDuration() != null)
+          .mapToLong(testData -> testData.getDuration().toMillis())
+          .sum();
     }
   }
 
@@ -262,14 +244,17 @@ public class TemplateHelpers {
       return allCacheKeys;
     }
 
-    public Map<String, SpringContextStatistics.CacheKeyInfo> aggregateCacheKeyInfo(List<TestClassExecutionData> testClassData) {
+    public Map<String, SpringContextStatistics.CacheKeyInfo> aggregateCacheKeyInfo(
+        List<TestClassExecutionData> testClassData) {
       Map<String, SpringContextStatistics.CacheKeyInfo> allCacheKeyInfo = new HashMap<>();
 
       for (TestClassExecutionData classData : testClassData) {
         SpringContextStatistics stats = classData.contextStatistics();
         if (stats != null) {
-          Map<String, SpringContextStatistics.CacheKeyInfo> classCacheKeyInfo = stats.getCacheKeyInfoMap();
-          for (Map.Entry<String, SpringContextStatistics.CacheKeyInfo> entry : classCacheKeyInfo.entrySet()) {
+          Map<String, SpringContextStatistics.CacheKeyInfo> classCacheKeyInfo =
+              stats.getCacheKeyInfoMap();
+          for (Map.Entry<String, SpringContextStatistics.CacheKeyInfo> entry :
+              classCacheKeyInfo.entrySet()) {
             String cacheKey = entry.getKey();
             SpringContextStatistics.CacheKeyInfo info = entry.getValue();
             SpringContextStatistics.CacheKeyInfo existing = allCacheKeyInfo.get(cacheKey);

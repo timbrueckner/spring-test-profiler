@@ -41,7 +41,8 @@ class TestExecutionDataTest {
 
   @Test
   void testTestMethodNameExtraction() {
-    TestExecutionData data = new TestExecutionData("com.example.TestClass#testMethod", Instant.now());
+    TestExecutionData data =
+        new TestExecutionData("com.example.TestClass#testMethod", Instant.now());
 
     assertEquals("testMethod", data.getTestMethodName());
     assertEquals("com.example.TestClass", data.getTestClassName());
@@ -49,7 +50,8 @@ class TestExecutionDataTest {
 
   @Test
   void testTestMethodNameExtractionWithNestedClass() {
-    TestExecutionData data = new TestExecutionData("com.example.OuterClass$InnerClass#testMethod", Instant.now());
+    TestExecutionData data =
+        new TestExecutionData("com.example.OuterClass$InnerClass#testMethod", Instant.now());
 
     assertEquals("testMethod", data.getTestMethodName());
     assertEquals("com.example.OuterClass$InnerClass", data.getTestClassName());

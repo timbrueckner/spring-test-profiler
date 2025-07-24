@@ -4,9 +4,7 @@ import java.util.List;
 
 import digital.pragmatech.testing.optimization.ContextOptimizationOpportunity;
 
-/**
- * Statistics about potential optimizations.
- */
+/** Statistics about potential optimizations. */
 public class OptimizationStatistics {
   private final long totalContextCreationTimeMs;
   private final long potentialTimeSavingsMs;
@@ -14,9 +12,12 @@ public class OptimizationStatistics {
   private final int totalContextsCreated;
   private final List<ContextOptimizationOpportunity> topOpportunities;
 
-  public OptimizationStatistics(long totalContextCreationTimeMs, long potentialTimeSavingsMs,
-    long wastedTimeMs, int totalContextsCreated,
-    List<ContextOptimizationOpportunity> topOpportunities) {
+  public OptimizationStatistics(
+      long totalContextCreationTimeMs,
+      long potentialTimeSavingsMs,
+      long wastedTimeMs,
+      int totalContextsCreated,
+      List<ContextOptimizationOpportunity> topOpportunities) {
     this.totalContextCreationTimeMs = totalContextCreationTimeMs;
     this.potentialTimeSavingsMs = potentialTimeSavingsMs;
     this.wastedTimeMs = wastedTimeMs;
@@ -45,7 +46,8 @@ public class OptimizationStatistics {
   }
 
   public double getPotentialTimeSavingsPercentage() {
-    return totalContextCreationTimeMs > 0 ?
-      (potentialTimeSavingsMs * 100.0) / totalContextCreationTimeMs : 0.0;
+    return totalContextCreationTimeMs > 0
+        ? (potentialTimeSavingsMs * 100.0) / totalContextCreationTimeMs
+        : 0.0;
   }
 }

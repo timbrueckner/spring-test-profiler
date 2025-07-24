@@ -13,11 +13,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = SpringContextCachingTest.FirstConfig.class, initializers = {TimingTrackingApplicationContextInitializer.class, SlowContextInitializer.class})
+@ContextConfiguration(
+    classes = SpringContextCachingTest.FirstConfig.class,
+    initializers = {
+      TimingTrackingApplicationContextInitializer.class,
+      SlowContextInitializer.class
+    })
 class SpringContextCachingTest {
 
-  @Autowired
-  private ApplicationContext applicationContext;
+  @Autowired private ApplicationContext applicationContext;
 
   @Test
   void testFirstContext() {
@@ -25,15 +29,13 @@ class SpringContextCachingTest {
   }
 
   @Configuration
-  static class FirstConfig {
-  }
+  static class FirstConfig {}
 
   @Nested
   @ContextConfiguration(classes = SecondConfig.class, initializers = SlowContextInitializer.class)
   class DifferentContextTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    @Autowired private ApplicationContext applicationContext;
 
     @Test
     void testSecondContext() {
@@ -43,16 +45,13 @@ class SpringContextCachingTest {
   }
 
   @Configuration
-  static class SecondConfig {
-
-  }
+  static class SecondConfig {}
 
   @Nested
   @ContextConfiguration(classes = FirstConfig.class)
   class SameContextTest {
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    @Autowired private ApplicationContext applicationContext;
 
     @Test
     void testReuseFirstContext() {

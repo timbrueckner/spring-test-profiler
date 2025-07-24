@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Spring Test Profiler is a JUnit Jupiter extension that provides visualization and insights for Spring Test execution, with a focus on Spring context caching statistics. The goal is to identify optimization opportunities in Spring Test suites to speed up builds.
+Spring Test Profiler is a Spring Test utility that provides visualization and insights for Spring Test execution, with a focus on Spring context caching statistics. The goal is to identify optimization opportunities in Spring Test suites to speed up builds.
 
 ### Architecture
 
-- **Core Extension** (`SpringTestProfilerListener`): JUnit Jupiter TestExecutionListener with HIGHEST_PRECEDENCE
-- **Context Profiling** (`TimingTrackingApplicationContextInitializer`): Deep integration into Spring context loading with timing and bean creation metrics
+- **Core Utility** (`SpringTestProfilerListener`): Spring Test TestExecutionListener with HIGHEST_PRECEDENCE
+- **Context Profiling** (`ContextDiagnosticApplicationContextInitializer`): Deep integration into Spring context loading with timing and bean creation metrics
 - **Statistics Collection**: Multi-layered tracking including Spring's internal cache and custom metrics beyond the 32-context limit
 - **Report Generation** (`TestExecutionReporter`): Self-contained HTML reports with embedded CSS/JS and optional JSON output
 - **Service Loader Integration**: Automatic activation via META-INF/spring.factories

@@ -29,7 +29,8 @@ public class TestExecutionReporter {
 
   private static final Logger logger = LoggerFactory.getLogger(TestExecutionReporter.class);
   private static final String REPORT_DIR_NAME = "spring-test-profiler";
-  private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+  private static final DateTimeFormatter TIMESTAMP_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
 
   private final TemplateEngine templateEngine;
   private final JsonReportGenerator jsonReportGenerator;
@@ -39,12 +40,14 @@ public class TestExecutionReporter {
     this.jsonReportGenerator = new JsonReportGenerator();
   }
 
-  public void generateReport(TestExecutionTracker executionTracker,
-    SpringContextCacheAccessor.CacheStatistics cacheStats,
-    ContextCacheTracker contextCacheTracker) {
+  public void generateReport(
+      TestExecutionTracker executionTracker,
+      SpringContextCacheAccessor.CacheStatistics cacheStats,
+      ContextCacheTracker contextCacheTracker) {
 
     // Beta feature flag for JSON reporting
-    boolean jsonReportingEnabled = Boolean.parseBoolean(System.getProperty("spring.test.insight.json.beta", "false"));
+    boolean jsonReportingEnabled =
+        Boolean.parseBoolean(System.getProperty("spring.test.insight.json.beta", "false"));
 
     try {
       BuildToolDetection.BuildTool buildTool = BuildToolDetection.getDetectedBuildTool();
@@ -52,18 +55,23 @@ public class TestExecutionReporter {
       Files.createDirectories(reportDir);
 
       if (jsonReportingEnabled) {
-        jsonReportGenerator.generateJsonReport(reportDir, executionTracker, cacheStats, contextCacheTracker);
-      }
-      else {
+        jsonReportGenerator.generateJsonReport(
+            reportDir, executionTracker, cacheStats, contextCacheTracker);
+      } else {
         // Original HTML reporting logic
         String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMATTER);
         String reportFileName = "test-profiler-report-" + timestamp + ".html";
         Path reportFile = reportDir.resolve(reportFileName);
 
-        String htmlContent = generateHtmlWithThymeleaf(buildTool.name(), executionTracker, cacheStats, contextCacheTracker);
+        String htmlContent =
+            generateHtmlWithThymeleaf(
+                buildTool.name(), executionTracker, cacheStats, contextCacheTracker);
         Files.write(reportFile, htmlContent.getBytes());
 
-        logger.info("Spring Test Profiler report generated for {} build tool: {}", buildTool.name(), reportFile.toAbsolutePath());
+        logger.info(
+            "Spring Test Profiler report generated for {} build tool: {}",
+            buildTool.name(),
+            reportFile.toAbsolutePath());
 
         // Also create a latest.html symlink for easy access
         Path latestLink = reportDir.resolve("latest.html");
@@ -71,15 +79,14 @@ public class TestExecutionReporter {
         Files.write(latestLink, htmlContent.getBytes());
       }
 
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       logger.error("Failed to generate Spring Test Profiler report", e);
     }
   }
 
   /**
-   * Determines the report directory based on the build tool and system properties.
-   * Supports custom directory via system property, or defaults to build tool conventions.
+   * Determines the report directory based on the build tool and system properties. Supports custom
+   * directory via system property, or defaults to build tool conventions.
    */
   private Path determineReportDirectory(BuildToolDetection.BuildTool buildTool) {
     String customDir = System.getProperty("pragmatech.spring.test.insight.report.dir");
@@ -101,11 +108,9 @@ public class TestExecutionReporter {
         // For unknown build tools, try to detect from current directory structure
         if (Files.exists(Paths.get("target"))) {
           baseDir = "target";
-        }
-        else if (Files.exists(Paths.get("build"))) {
+        } else if (Files.exists(Paths.get("build"))) {
           baseDir = "build";
-        }
-        else {
+        } else {
           // Fallback to creating in current directory
           baseDir = ".";
         }
@@ -113,7 +118,6 @@ public class TestExecutionReporter {
 
     return Paths.get(baseDir, REPORT_DIR_NAME);
   }
-
 
   private TemplateEngine createTemplateEngine() {
     TemplateEngine engine = new TemplateEngine();
@@ -129,15 +133,19 @@ public class TestExecutionReporter {
     return engine;
   }
 
-  private String generateHtmlWithThymeleaf(String buildTool, TestExecutionTracker executionTracker,
-    SpringContextCacheAccessor.CacheStatistics cacheStats,
-    ContextCacheTracker contextCacheTracker) {
+  private String generateHtmlWithThymeleaf(
+      String buildTool,
+      TestExecutionTracker executionTracker,
+      SpringContextCacheAccessor.CacheStatistics cacheStats,
+      ContextCacheTracker contextCacheTracker) {
     try {
       Context context = new Context();
 
       // Basic template variables
       context.setVariable("phase", buildTool);
-      context.setVariable("generatedAt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+      context.setVariable(
+          "generatedAt",
+          LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
       context.setVariable("executionTracker", executionTracker);
       context.setVariable("cacheStats", cacheStats);
       context.setVariable("contextCacheTracker", contextCacheTracker);
@@ -151,7 +159,8 @@ public class TestExecutionReporter {
       context.setVariable("extensionVersion", VersionInfo.getVersion());
 
       // Pre-compute test status counts to avoid complex template expressions
-      Map<String, TestExecutionTracker.TestClassMetrics> classMetrics = executionTracker.getClassMetrics();
+      Map<String, TestExecutionTracker.TestClassMetrics> classMetrics =
+          executionTracker.getClassMetrics();
       long passedTests = TemplateHelpers.countTestsByStatus(classMetrics, "PASSED");
       long failedTests = TemplateHelpers.countTestsByStatus(classMetrics, "FAILED");
       long disabledTests = TemplateHelpers.countTestsByStatus(classMetrics, "DISABLED");
@@ -170,7 +179,7 @@ public class TestExecutionReporter {
       // Calculate and add optimization statistics
       if (contextCacheTracker != null) {
         OptimizationStatistics optimizationStats =
-          contextCacheTracker.calculateOptimizationStatistics();
+            contextCacheTracker.calculateOptimizationStatistics();
         context.setVariable("optimizationStats", optimizationStats);
 
         // Add timeline data for visualization
@@ -188,13 +197,11 @@ public class TestExecutionReporter {
       String result = templateEngine.process("report", context);
       logger.info("Successfully generated HTML with Thymeleaf templates");
       return result;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Failed to generate HTML with Thymeleaf ", e);
       throw new RuntimeException("Report generation failed", e);
     }
   }
-
 
   private void registerHelperBeans(Context context, ContextCacheTracker contextCacheTracker) {
     // Register all helper beans that templates can use
@@ -208,7 +215,8 @@ public class TestExecutionReporter {
     context.setVariable("classNameComparator", new TemplateHelpers.ClassNameComparator());
     context.setVariable("cacheKeyProcessor", new TemplateHelpers.CacheKeyProcessor());
     context.setVariable("summaryCalculator", new TemplateHelpers.SummaryCalculator());
-    context.setVariable("configurationHelper", new TemplateHelpers.ConfigurationHelper(contextCacheTracker));
+    context.setVariable(
+        "configurationHelper", new TemplateHelpers.ConfigurationHelper(contextCacheTracker));
     context.setVariable("testStatusCounter", new TemplateHelpers.TestStatusCounter());
     context.setVariable("jsonHelper", new TemplateHelpers.JsonHelper());
   }
@@ -216,15 +224,15 @@ public class TestExecutionReporter {
   private String loadCssContent() {
     try {
       // Use InputStream to read from classpath resource which works both in IDE and JAR
-      try (var inputStream = getClass().getClassLoader()
-        .getResourceAsStream("static/css/spring-test-profiler.css")) {
+      try (var inputStream =
+          getClass().getClassLoader().getResourceAsStream("static/css/spring-test-profiler.css")) {
         if (inputStream == null) {
-          throw new RuntimeException("CSS file not found in classpath: static/css/spring-test-profiler.css");
+          throw new RuntimeException(
+              "CSS file not found in classpath: static/css/spring-test-profiler.css");
         }
         return new String(inputStream.readAllBytes());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Could not load CSS file. Report generation will fail.", e);
       throw new RuntimeException("CSS file not found", e);
     }

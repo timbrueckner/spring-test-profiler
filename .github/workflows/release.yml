@@ -62,7 +62,7 @@ jobs:
       - name: Run JReleaser
         uses: jreleaser/release-action@v2
         with:
-          arguments: 'deploy --git-root-search'
+          arguments: 'full-release --git-root-search'
           version: 1.19.0
         env:
           JRELEASER_PROJECT_VERSION: ${{ env.RELEASE_VERSION }}

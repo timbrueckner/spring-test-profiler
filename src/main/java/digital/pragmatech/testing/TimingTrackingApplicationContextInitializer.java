@@ -15,21 +15,27 @@ import org.springframework.core.annotation.Order;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 /**
- * Enhanced ApplicationContextInitializer that provides comprehensive profiling of Spring context loading.
- * Tracks timing, memory usage, bean creation, and lifecycle events from within the Spring context loading process.
+ * Enhanced ApplicationContextInitializer that provides comprehensive profiling of Spring context
+ * loading. Tracks timing, memory usage, bean creation, and lifecycle events from within the Spring
+ * context loading process.
  */
 @Order(HIGHEST_PRECEDENCE)
-public class TimingTrackingApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class TimingTrackingApplicationContextInitializer
+    implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-  private static final Logger logger = LoggerFactory.getLogger(TimingTrackingApplicationContextInitializer.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(TimingTrackingApplicationContextInitializer.class);
 
   // Thread-safe maps for context tracking
-  private static final Map<ConfigurableApplicationContext, Instant> contextStartTimes = new ConcurrentHashMap<>();
+  private static final Map<ConfigurableApplicationContext, Instant> contextStartTimes =
+      new ConcurrentHashMap<>();
   private static final Map<String, Long> contextLoadTimes = new ConcurrentHashMap<>();
-  private static final Map<String, ContextProfileData> contextProfileData = new ConcurrentHashMap<>();
+  private static final Map<String, ContextProfileData> contextProfileData =
+      new ConcurrentHashMap<>();
 
   // Memory tracking
-  private static final Map<ConfigurableApplicationContext, Long> contextStartMemory = new ConcurrentHashMap<>();
+  private static final Map<ConfigurableApplicationContext, Long> contextStartMemory =
+      new ConcurrentHashMap<>();
 
   @Override
   public void initialize(ConfigurableApplicationContext applicationContext) {
@@ -47,28 +53,39 @@ public class TimingTrackingApplicationContextInitializer implements ApplicationC
     ContextProfileData profileData = new ContextProfileData(contextId, startTime, startMemory);
     contextProfileData.put(contextId, profileData);
 
-    logger.debug("Context profiling started for {} (start memory: {}MB)", contextId, startMemory / 1024 / 1024);
+    logger.debug(
+        "Context profiling started for {} (start memory: {}MB)",
+        contextId,
+        startMemory / 1024 / 1024);
 
     // Add bean creation profiler
     BeanCreationProfiler beanProfiler = new BeanCreationProfiler(contextId);
     applicationContext.getBeanFactory().addBeanPostProcessor(beanProfiler);
 
     // Add BeanFactory post-processor for early profiling
-    applicationContext.addBeanFactoryPostProcessor(beanFactory -> {
-      profileData.setBeanDefinitionCount(beanFactory.getBeanDefinitionCount());
-      profileData.recordPhase("BeanDefinitionRegistration", Instant.now());
-      logger.debug("Registered {} bean definitions for context {}",
-        beanFactory.getBeanDefinitionCount(), contextId);
-    });
+    applicationContext.addBeanFactoryPostProcessor(
+        beanFactory -> {
+          profileData.setBeanDefinitionCount(beanFactory.getBeanDefinitionCount());
+          profileData.recordPhase("BeanDefinitionRegistration", Instant.now());
+          logger.debug(
+              "Registered {} bean definitions for context {}",
+              beanFactory.getBeanDefinitionCount(),
+              contextId);
+        });
 
     // Add comprehensive lifecycle listener
-    applicationContext.addApplicationListener(event -> {
-      handleContextEvent(event, applicationContext, contextId, profileData, beanProfiler);
-    });
+    applicationContext.addApplicationListener(
+        event -> {
+          handleContextEvent(event, applicationContext, contextId, profileData, beanProfiler);
+        });
   }
 
-  private void handleContextEvent(Object event, ConfigurableApplicationContext applicationContext,
-    String contextId, ContextProfileData profileData, BeanCreationProfiler beanProfiler) {
+  private void handleContextEvent(
+      Object event,
+      ConfigurableApplicationContext applicationContext,
+      String contextId,
+      ContextProfileData profileData,
+      BeanCreationProfiler beanProfiler) {
     if (event instanceof ApplicationContextEvent) {
       ApplicationContextEvent contextEvent = (ApplicationContextEvent) event;
 
@@ -86,8 +103,11 @@ public class TimingTrackingApplicationContextInitializer implements ApplicationC
     }
   }
 
-  private void finalizeContextProfiling(ConfigurableApplicationContext applicationContext, String contextId,
-    ContextProfileData profileData, BeanCreationProfiler beanProfiler) {
+  private void finalizeContextProfiling(
+      ConfigurableApplicationContext applicationContext,
+      String contextId,
+      ContextProfileData profileData,
+      BeanCreationProfiler beanProfiler) {
     Instant endTime = Instant.now();
     long endMemory = getUsedMemory();
 
@@ -108,8 +128,12 @@ public class TimingTrackingApplicationContextInitializer implements ApplicationC
       // Store for retrieval
       contextLoadTimes.put(contextId, loadTimeMs);
 
-      logger.info("Context {} loaded in {}ms (memory: +{}MB, beans: {})",
-        contextId, loadTimeMs, memoryUsed / 1024 / 1024, beanProfiler.getMetrics().getTotalBeansCreated());
+      logger.info(
+          "Context {} loaded in {}ms (memory: +{}MB, beans: {})",
+          contextId,
+          loadTimeMs,
+          memoryUsed / 1024 / 1024,
+          beanProfiler.getMetrics().getTotalBeansCreated());
     }
   }
 

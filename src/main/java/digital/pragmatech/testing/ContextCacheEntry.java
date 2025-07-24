@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.test.context.MergedContextConfiguration;
 
-/**
- * Entry representing a cached context configuration.
- */
+/** Entry representing a cached context configuration. */
 public class ContextCacheEntry {
   private final MergedContextConfiguration configuration;
   private final Set<String> testClasses = ConcurrentHashMap.newKeySet();
@@ -107,8 +105,8 @@ public class ContextCacheEntry {
   }
 
   /**
-   * Gets all access times for timeline visualization.
-   * Returns an unmodifiable list of timestamps when this context was accessed.
+   * Gets all access times for timeline visualization. Returns an unmodifiable list of timestamps
+   * when this context was accessed.
    */
   public List<Instant> getAccessTimes() {
     return Collections.unmodifiableList(accessTimes);
@@ -166,15 +164,17 @@ public class ContextCacheEntry {
     return contextLoadTimeMs;
   }
 
-  /**
-   * Gets a summary of the configuration for reporting.
-   */
+  /** Gets a summary of the configuration for reporting. */
   public Map<String, Object> getConfigurationSummary() {
     Map<String, Object> summary = new LinkedHashMap<>();
 
     if (configuration != null) {
 
-      summary.put("configurationClasses", Arrays.stream(configuration.getClasses()).map(Class::getSimpleName).collect(Collectors.toList()));
+      summary.put(
+          "configurationClasses",
+          Arrays.stream(configuration.getClasses())
+              .map(Class::getSimpleName)
+              .collect(Collectors.toList()));
 
       summary.put("activeProfiles", Arrays.asList(configuration.getActiveProfiles()));
       summary.put("contextLoader", configuration.getContextLoader().getClass().getSimpleName());
@@ -184,9 +184,11 @@ public class ContextCacheEntry {
       summary.put("contextCustomizers", configuration.getContextCustomizers());
       summary.put("locations", String.join(",", configuration.getLocations()));
 
-      summary.put("contextInitializers", configuration.getContextInitializerClasses().stream()
-        .map(Class::getSimpleName)
-        .collect(Collectors.toList()));
+      summary.put(
+          "contextInitializers",
+          configuration.getContextInitializerClasses().stream()
+              .map(Class::getSimpleName)
+              .collect(Collectors.toList()));
 
       summary.put("beanDefinitionCount", beanDefinitionCount);
     }
