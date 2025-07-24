@@ -79,18 +79,23 @@ Add a file named `META-INF/spring.factories` to your resources directory with th
 ```text
 org.springframework.test.context.TestExecutionListener=\
 digital.pragmatech.testing.SpringTestProfilerListener
+org.springframework.context.ApplicationContextInitializer=\
+digital.pragmatech.testing.diagnostic.ContextDiagnosticApplicationInitializer
 ```
 
 #### Manually for Specific Tests
 
-Add the `@TestExecutionListeners` annotation to your test classes:
+Add the `@TestExecutionListeners` and `@ContextConfiguration` annotations to your test classes:
 
 ```java
 @TestExecutionListeners(
   value = {SpringTestProfilerListener.class},
   mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
+@ContextConfiguration(initializers = ContextDiagnosticApplicationInitializer.class)
 ```
+
+This needs to be done for each test class where you want to use the profiler. Preferably, use this on a central abstract integration test class or use the automatic activation method above.
 
 ### 3. Run Your Tests
 

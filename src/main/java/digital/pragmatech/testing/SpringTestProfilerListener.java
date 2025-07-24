@@ -189,7 +189,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   @Override
-  public void afterTestMethod(TestContext testContext) throws Exception {
+  public void afterTestExecution(TestContext testContext) throws Exception {
     String className = testClassNames.get(testContext);
     String methodName = testContext.getTestMethod().getName();
 

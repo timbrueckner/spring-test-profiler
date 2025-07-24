@@ -6,7 +6,10 @@ import digital.pragmatech.demo.entity.Book;
 import digital.pragmatech.demo.entity.BookCategory;
 import digital.pragmatech.demo.repository.BookRepository;
 import digital.pragmatech.demo.service.BookService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -74,5 +77,21 @@ public class GoodIT {
 
     assertTrue(found.isPresent());
     assertEquals(created.getId(), found.get().getId());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"Test1", "Test2", "Test3"})
+  void verifyParameterizedTest(String input) {
+    // Example of a parameterized test that reuses the same context
+    assertNotNull(input);
+    assertTrue(input.startsWith("Test"));
+    System.out.println("Running parameterized test with input: " + input);
+  }
+
+  @DisplayName("Nice Test Name 🧪")
+  void testDisplayName() {
+    // Example of a test with a custom display name
+    assertTrue(true, "This test should always pass");
+    System.out.println("Running test with custom display name");
   }
 }
