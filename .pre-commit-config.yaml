@@ -15,3 +15,9 @@ repos:
     hooks:
       - id: maven
         args: ['-f pom.xml spotless:apply']
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: []
