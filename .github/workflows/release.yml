@@ -28,26 +28,18 @@ jobs:
 
       - name: Validate input versions
         run: |
-          if [ "$RELEASE_VERSION" = "${{ github.event.inputs.nextVersion }}" ]; then
+          if [ "$RELEASE_VERSION" = "$NEXT_DEV_VERSION" ]; then
             echo "❌ Error: Release version and next version cannot be the same!"
             echo "Release version: $RELEASE_VERSION"
-            echo "Next version: ${{ github.event.inputs.nextVersion }}"
+            echo "Next version: $NEXT_DEV_VERSION"
             exit 1
           fi
           echo "✅ Version validation passed"
           echo "Release version: $RELEASE_VERSION"
-          echo "Next version: ${{ github.event.inputs.nextVersion }}"
+          echo "Next version: $NEXT_DEV_VERSION"
 
-      - name: Validate Maven version
-        run: |
-          POM_VERSION=$(grep -m1 '<version>' pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
-          if [ "$POM_VERSION" != "$RELEASE_VERSION" ]; then
-            echo "❌ Error: pom.xml version does not match release version!"
-            echo "pom.xml version: $POM_VERSION"
-            echo "Release version: $RELEASE_VERSION"
-            exit 1
-          fi
-          echo "✅ pom.xml version validation passed: $POM_VERSION"
+      - name: Update Maven Version
+        run: ./mvnw --batch-mode versions:set -DnewVersion="$RELEASE_VERSION"
 
       - name: Set up Java
         uses: actions/setup-java@v4
