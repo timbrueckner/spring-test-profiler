@@ -134,7 +134,8 @@ We welcome contributions! Here's how to get started:
 ### Development Setup
 
 1. **Fork and clone** the repository
-2. **Build the project**:
+2. **Activate pre-commit hooks** (this ensures compliant code formatting): `pre-commit install` ([pre-commit download](https://pre-commit.com/))
+3. **Build the project**:
 
 ```bash
 ./mvnw install
@@ -145,3 +146,5 @@ We welcome contributions! Here's how to get started:
 ```bash
 ./mvnw test
 ```
+
+4. Use conventional commit messages for your changes (e.g., `feat: add new feature`, `fix: resolve issue #123`)
