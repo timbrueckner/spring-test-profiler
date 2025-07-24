@@ -176,6 +176,18 @@ public class TestExecutionReporter {
       double successRate = totalTestMethods > 0 ? (passedTests * 100.0) / totalTestMethods : 0.0;
       context.setVariable("successRate", successRate);
 
+      // Extract available processors from any context entry (they're all the same)
+      Integer availableProcessors = null;
+      if (contextCacheTracker != null) {
+        availableProcessors =
+            contextCacheTracker.getAllEntries().stream()
+                .filter(entry -> entry.getAvailableProcessors() > 0)
+                .map(entry -> entry.getAvailableProcessors())
+                .findFirst()
+                .orElse(null);
+      }
+      context.setVariable("availableProcessors", availableProcessors);
+
       // Calculate and add optimization statistics
       if (contextCacheTracker != null) {
         OptimizationStatistics optimizationStats =

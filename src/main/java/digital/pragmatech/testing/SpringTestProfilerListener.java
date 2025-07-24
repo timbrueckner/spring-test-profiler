@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import digital.pragmatech.testing.diagnostic.ContextDiagnostic;
 import digital.pragmatech.testing.reporting.html.TestExecutionReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,10 +137,24 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
           logger.debug(
               "Context cache hit for test class {} ({}ms)", className, contextLoadDurationMs);
         } else {
-          contextCacheTracker.recordContextCreation(mergedConfig, contextLoadDurationMs);
+          // Try to get ContextDiagnostic information using getBeanProvider
+          org.springframework.context.ConfigurableApplicationContext configurableContext =
+              (org.springframework.context.ConfigurableApplicationContext)
+                  testContext.getApplicationContext();
+          ContextDiagnostic contextDiagnostic =
+              configurableContext.getBeanProvider(ContextDiagnostic.class).getIfAvailable();
+
+          if (contextDiagnostic != null) {
+            contextCacheTracker.recordContextCreation(
+                mergedConfig,
+                contextLoadDurationMs,
+                contextDiagnostic.heapMemoryUsedBytes(),
+                contextDiagnostic.availableProcessors());
+          } else {
+            contextCacheTracker.recordContextCreation(mergedConfig, contextLoadDurationMs);
+          }
 
           // Capture bean definitions for context complexity analysis
-
           String[] beanNames = testContext.getApplicationContext().getBeanDefinitionNames();
           contextCacheTracker.recordBeanDefinitions(mergedConfig, beanNames);
           logger.debug(

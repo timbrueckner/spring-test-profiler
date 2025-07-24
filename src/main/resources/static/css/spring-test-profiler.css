@@ -191,7 +191,7 @@ h2 {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .execution-detail {
         flex-direction: row;
         gap: 8px;
@@ -298,6 +298,37 @@ h2 {
 .bean-count {
     color: #7f8c8d;
     font-size: 14px;
+}
+
+.context-stats {
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.stat-row:last-child {
+    margin-bottom: 0;
+}
+
+.stat-label {
+    color: #34495e;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stat-value {
+    color: #2c3e50;
+    font-size: 13px;
+    font-family: monospace;
+    font-weight: 600;
 }
 
 .test-classes {
@@ -902,16 +933,16 @@ h2 {
     .optimization-summary {
         grid-template-columns: 1fr;
     }
-    
+
     .tips-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .impact-content {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .opportunity-header {
         flex-direction: column;
         align-items: flex-start;
@@ -1146,24 +1177,24 @@ h2 {
         gap: 15px;
         align-items: center;
     }
-    
+
     .timeline-summary {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .insights-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .timeline-chart-container {
         height: 300px;
     }
-    
+
     .timeline-table {
         font-size: 12px;
     }
-    
+
     .timeline-table th,
     .timeline-table td {
         padding: 8px;

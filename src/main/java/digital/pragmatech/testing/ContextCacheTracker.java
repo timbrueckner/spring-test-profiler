@@ -100,6 +100,37 @@ public class ContextCacheTracker {
     }
   }
 
+  /** Records that a new context was created with timing and diagnostic information. */
+  public void recordContextCreation(
+      MergedContextConfiguration config,
+      long loadTimeMs,
+      long heapMemoryUsedBytes,
+      int availableProcessors) {
+    ContextCacheEntry entry = cacheEntries.get(config);
+    if (entry != null) {
+      entry.recordCreation(loadTimeMs);
+      entry.setContextDiagnostic(heapMemoryUsedBytes, availableProcessors);
+      contextCreationOrder.add(config);
+      totalContextsCreated.incrementAndGet();
+      cacheMisses.incrementAndGet();
+
+      // Find nearest existing context if this is not the first one
+      if (contextCreationOrder.size() > 1) {
+        MergedContextConfiguration nearestConfig = findNearestContext(config);
+        if (nearestConfig != null) {
+          entry.setNearestContext(nearestConfig);
+          logger.info(
+              "New context {} is most similar to existing context {} (load time: {}ms, heap: {}MB, processors: {})",
+              config,
+              nearestConfig,
+              loadTimeMs,
+              heapMemoryUsedBytes / (1024.0 * 1024.0),
+              availableProcessors);
+        }
+      }
+    }
+  }
+
   /** Records bean definitions for a context configuration. */
   public void recordBeanDefinitions(MergedContextConfiguration config, String[] beanNames) {
     ContextCacheEntry entry = cacheEntries.get(config);

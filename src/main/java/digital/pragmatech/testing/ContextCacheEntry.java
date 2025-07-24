@@ -29,6 +29,10 @@ public class ContextCacheEntry {
   private volatile Set<String> beanDefinitionNames = ConcurrentHashMap.newKeySet();
   private volatile long contextLoadTimeMs = 0;
 
+  // ContextDiagnostic fields
+  private volatile long heapMemoryUsedBytes = 0;
+  private volatile int availableProcessors = 0;
+
   // Timeline tracking for future visualization
   private final List<Instant> accessTimes = new CopyOnWriteArrayList<>();
 
@@ -74,6 +78,11 @@ public class ContextCacheEntry {
     this.beanDefinitionCount = beanNames.length;
     this.beanDefinitionNames.clear();
     this.beanDefinitionNames.addAll(Arrays.asList(beanNames));
+  }
+
+  public void setContextDiagnostic(long heapMemoryUsedBytes, int availableProcessors) {
+    this.heapMemoryUsedBytes = heapMemoryUsedBytes;
+    this.availableProcessors = availableProcessors;
   }
 
   public MergedContextConfiguration getConfiguration() {
@@ -162,6 +171,18 @@ public class ContextCacheEntry {
 
   public long getContextLoadTimeMs() {
     return contextLoadTimeMs;
+  }
+
+  public long getHeapMemoryUsedBytes() {
+    return heapMemoryUsedBytes;
+  }
+
+  public double getHeapMemoryUsedMB() {
+    return heapMemoryUsedBytes / (1024.0 * 1024.0);
+  }
+
+  public int getAvailableProcessors() {
+    return availableProcessors;
   }
 
   /** Gets a summary of the configuration for reporting. */

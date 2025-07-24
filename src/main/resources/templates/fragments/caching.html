@@ -3,7 +3,7 @@
 <body>
     <div th:fragment="caching-section(cacheStats, contextCacheTracker)" class="cache-stats">
         <h2>Spring Context Caching Statistics</h2>
-        
+
         <!-- Basic cache metrics -->
         <div th:if="${cacheStats != null}" class="cache-overview">
             <div class="cache-metric">
@@ -23,7 +23,7 @@
                 <span class="value hit-rate" th:text="${#numbers.formatDecimal(cacheStats.getHitRatio() * 100, 1, 1) + '%'}">0.0%</span>
             </div>
         </div>
-        
+
         <!-- Detailed context information -->
         <div th:if="${contextCacheTracker != null and contextCacheTracker.getAllEntries().size() > 0}" class="context-cache-details">
             <h3>Context Cache Entries</h3>
@@ -32,15 +32,25 @@
                     <span class="cache-id" th:text="${'Context ID: ' + entry.configuration.hashCode()}">Context ID: 12345</span>
                     <span class="bean-count" th:text="${entry.beanDefinitionCount + ' beans'}">0 beans</span>
                 </div>
+                <div class="context-stats">
+                    <div class="stat-row">
+                        <span class="stat-label">Load Time:</span>
+                        <span class="stat-value" th:text="${entry.contextLoadTimeMs + 'ms'}">0ms</span>
+                    </div>
+                    <div class="stat-row" th:if="${entry.heapMemoryUsedBytes > 0}">
+                        <span class="stat-label">Heap Memory:</span>
+                        <span class="stat-value" th:text="${#numbers.formatDecimal(entry.heapMemoryUsedMB, 1, 1) + 'MB'}">0.0MB</span>
+                    </div>
+                </div>
                 <div class="test-classes">
                     <strong>Test Classes:</strong>
-                    <span th:each="testClass, iterStat : ${entry.testClasses}" 
-                          th:text="${testClass + (iterStat.last ? '' : ', ')}" 
+                    <span th:each="testClass, iterStat : ${entry.testClasses}"
+                          th:text="${testClass + (iterStat.last ? '' : ', ')}"
                           class="test-class">TestClass</span>
                 </div>
             </div>
         </div>
-        
+
         <div th:if="${cacheStats == null and (contextCacheTracker == null or contextCacheTracker.getAllEntries().size() == 0)}" class="cache-unavailable">
             <p>No context cache information is available.</p>
         </div>
