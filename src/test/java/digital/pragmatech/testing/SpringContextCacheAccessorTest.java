@@ -27,10 +27,10 @@ class SpringContextCacheAccessorTest {
 
     // Then
     assertNotNull(stats);
-    assertTrue(stats.getMaxSize() > 0, "Max size should be positive");
-    assertEquals(0, stats.getSize());
-    assertEquals(0, stats.getHitCount());
-    assertEquals(0, stats.getMissCount());
+    assertTrue(stats.maxSize() > 0, "Max size should be positive");
+    assertEquals(0, stats.size());
+    assertEquals(0, stats.hitCount());
+    assertEquals(0, stats.missCount());
   }
 
   @Test

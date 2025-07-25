@@ -11,10 +11,12 @@ import digital.pragmatech.testing.reporting.html.TestExecutionReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
+import org.springframework.lang.NonNull;
 import org.springframework.test.context.BootstrapUtils;
 import org.springframework.test.context.MergedContextConfiguration;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestContextBootstrapper;
+import org.springframework.test.context.cache.ContextCache;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 /**
@@ -49,7 +51,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   @Override
-  public void beforeTestClass(TestContext testContext) throws Exception {
+  public void beforeTestClass(@NonNull TestContext testContext) throws Exception {
     Class<?> testClass = testContext.getTestClass();
     String className = testClass.getName();
 
@@ -87,7 +89,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   @Override
-  public void prepareTestInstance(TestContext testContext) throws Exception {
+  public void prepareTestInstance(@NonNull TestContext testContext) throws Exception {
     // After test instance is prepared, the context should be loaded
     String className = testClassNames.get(testContext);
     Instant contextLoadEndTime = Instant.now();
@@ -174,7 +176,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   @Override
-  public void afterTestClass(TestContext testContext) throws Exception {
+  public void afterTestClass(@NonNull TestContext testContext) throws Exception {
     String className = testClassNames.get(testContext);
     if (className != null) {
       executionTracker.recordTestClassEnd(className);
@@ -186,7 +188,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   @Override
-  public void beforeTestMethod(TestContext testContext) throws Exception {
+  public void beforeTestMethod(@NonNull TestContext testContext) throws Exception {
     String className = testClassNames.get(testContext);
     String methodName = testContext.getTestMethod().getName();
 
@@ -204,7 +206,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   @Override
-  public void afterTestExecution(TestContext testContext) throws Exception {
+  public void afterTestExecution(@NonNull TestContext testContext) throws Exception {
     String className = testClassNames.get(testContext);
     String methodName = testContext.getTestMethod().getName();
 
@@ -272,7 +274,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
   }
 
   /** Gets the Spring ContextCache if available. */
-  public static org.springframework.test.context.cache.ContextCache getContextCache() {
+  public static ContextCache getContextCache() {
     TestContext context = lastTestContext.get();
     if (context != null) {
       return SpringContextCacheAccessor.getContextCache(context);
@@ -282,7 +284,7 @@ public class SpringTestProfilerListener extends AbstractTestExecutionListener {
 
   /** Gets cache statistics from Spring's DefaultContextCache. */
   public static SpringContextCacheAccessor.CacheStatistics getCacheStatistics() {
-    org.springframework.test.context.cache.ContextCache cache = getContextCache();
+    ContextCache cache = getContextCache();
     return SpringContextCacheAccessor.getCacheStatistics(cache);
   }
 }

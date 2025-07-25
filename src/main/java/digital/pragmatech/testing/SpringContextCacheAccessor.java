@@ -106,13 +106,8 @@ public class SpringContextCacheAccessor {
   }
 
   /** Container for cache statistics. */
-  public static class CacheStatistics {
-    private final int size;
-    private final int hitCount;
-    private final int missCount;
-    private final int maxSize;
-    private final List<String> contextKeys;
-
+  public record CacheStatistics(
+      int size, int hitCount, int missCount, int maxSize, List<String> contextKeys) {
     public CacheStatistics(
         int size, int hitCount, int missCount, int maxSize, List<String> contextKeys) {
       this.size = size;
@@ -122,28 +117,13 @@ public class SpringContextCacheAccessor {
       this.contextKeys = new ArrayList<>(contextKeys);
     }
 
-    public int getSize() {
-      return size;
-    }
-
-    public int getMaxSize() {
-      return maxSize;
-    }
-
-    public int getHitCount() {
-      return hitCount;
-    }
-
-    public int getMissCount() {
-      return missCount;
-    }
-
     public double getHitRatio() {
       int totalAccess = hitCount + missCount;
       return totalAccess > 0 ? (double) hitCount / totalAccess : 0.0;
     }
 
-    public List<String> getContextKeys() {
+    @Override
+    public List<String> contextKeys() {
       return Collections.unmodifiableList(contextKeys);
     }
 
