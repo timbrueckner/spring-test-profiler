@@ -206,6 +206,15 @@ public class TestExecutionReporter {
       // Register helper beans for templates
       registerHelperBeans(context, contextCacheTracker);
 
+      // Add context statistics JSON for JavaScript consumption
+      if (contextCacheTracker != null) {
+        TemplateHelpers.JsonHelper jsonHelper = new TemplateHelpers.JsonHelper();
+        String contextStatisticsJson = jsonHelper.contextStatisticsToJson(contextCacheTracker);
+        context.setVariable("contextStatisticsJson", contextStatisticsJson);
+      } else {
+        context.setVariable("contextStatisticsJson", "[]");
+      }
+
       String result = templateEngine.process("report", context);
       logger.info("Successfully generated HTML with Thymeleaf templates");
       return result;

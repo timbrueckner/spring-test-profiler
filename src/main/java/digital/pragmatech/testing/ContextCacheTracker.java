@@ -73,6 +73,13 @@ public class ContextCacheTracker {
     contextToTestMethods
         .computeIfAbsent(config, k -> new CopyOnWriteArrayList<>())
         .add(testMethodIdentifier);
+
+    // Also add to the ContextCacheEntry
+    ContextCacheEntry entry = cacheEntries.get(config);
+    if (entry != null) {
+      entry.addTestMethod(testClassName, methodName);
+    }
+
     logger.debug("Recorded test method {} for context config: {}", testMethodIdentifier, config);
   }
 

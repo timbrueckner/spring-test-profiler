@@ -19,6 +19,7 @@ import org.springframework.test.context.MergedContextConfiguration;
 public class ContextCacheEntry {
   private final MergedContextConfiguration configuration;
   private final Set<String> testClasses = ConcurrentHashMap.newKeySet();
+  private final Set<String> testMethods = ConcurrentHashMap.newKeySet();
   private volatile boolean created = false;
   private volatile Instant creationTime;
   private volatile Instant lastUsedTime;
@@ -42,6 +43,11 @@ public class ContextCacheEntry {
 
   public void addTestClass(String testClassName) {
     testClasses.add(testClassName);
+  }
+
+  public void addTestMethod(String testClassName, String methodName) {
+    String testMethodIdentifier = testClassName + "#" + methodName;
+    testMethods.add(testMethodIdentifier);
   }
 
   public void recordCreation() {
@@ -91,6 +97,10 @@ public class ContextCacheEntry {
 
   public Set<String> getTestClasses() {
     return Collections.unmodifiableSet(testClasses);
+  }
+
+  public Set<String> getTestMethods() {
+    return Collections.unmodifiableSet(testMethods);
   }
 
   public boolean isCreated() {

@@ -1,5 +1,7 @@
 package digital.pragmatech.testing.reporting;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -299,6 +301,121 @@ public class TemplateHelpers {
         return "[]";
       }
       return toJson(timelineData.events());
+    }
+
+    public String contextStatisticsToJson(ContextCacheTracker contextCacheTracker) {
+      if (contextCacheTracker == null) {
+        return "[]";
+      }
+
+      List<Map<String, Object>> contextStatistics =
+          contextCacheTracker.getAllEntries().stream()
+              .filter(ContextCacheEntry::isCreated)
+              .map(this::mapContextEntryToStatistics)
+              .collect(Collectors.toList());
+
+      return toJson(contextStatistics);
+    }
+
+    private Map<String, Object> mapContextEntryToStatistics(ContextCacheEntry entry) {
+      Map<String, Object> statistics = new HashMap<>();
+
+      // Generate unique context key based on configuration hash
+      String contextKey = "context-" + Math.abs(entry.getConfiguration().hashCode());
+      statistics.put("contextKey", contextKey);
+
+      // Load duration in milliseconds
+      statistics.put("loadDuration", entry.getContextLoadTimeMs());
+
+      // Unix UTC timestamps (convert Instant to epoch seconds)
+      statistics.put(
+          "initialLoadTime",
+          entry.getCreationTime() != null ? entry.getCreationTime().getEpochSecond() : null);
+      statistics.put(
+          "lastUsedTime",
+          entry.getLastUsedTime() != null ? entry.getLastUsedTime().getEpochSecond() : null);
+
+      // Number of beans in the context
+      statistics.put("numberOfBeans", entry.getBeanDefinitionCount());
+
+      // Test classes using this context
+      statistics.put("testClasses", new ArrayList<>(entry.getTestClasses()));
+
+      // Test methods - need to enhance ContextCacheTracker to collect these
+      statistics.put("testMethods", getTestMethodsForContext(entry));
+
+      // Context configuration details
+      statistics.put("contextConfiguration", mapContextConfiguration(entry));
+
+      return statistics;
+    }
+
+    private List<String> getTestMethodsForContext(ContextCacheEntry entry) {
+      return new ArrayList<>(entry.getTestMethods());
+    }
+
+    private Map<String, Object> mapContextConfiguration(ContextCacheEntry entry) {
+      Map<String, Object> config = new HashMap<>();
+
+      if (entry.getConfiguration() != null) {
+        var mergedConfig = entry.getConfiguration();
+
+        // Test class that defines this configuration
+        config.put(
+            "testClass",
+            entry.getTestClasses().isEmpty() ? null : entry.getTestClasses().iterator().next());
+
+        // Configuration locations
+        config.put("locations", Arrays.asList(mergedConfig.getLocations()));
+
+        // Configuration classes
+        config.put(
+            "classes",
+            Arrays.stream(mergedConfig.getClasses())
+                .map(Class::getName)
+                .collect(Collectors.toList()));
+
+        // Context initializer classes
+        config.put(
+            "contextInitializerClasses",
+            mergedConfig.getContextInitializerClasses().stream()
+                .map(Class::getName)
+                .collect(Collectors.toList()));
+
+        // Active profiles
+        config.put("activeProfiles", Arrays.asList(mergedConfig.getActiveProfiles()));
+
+        // Property source locations
+        config.put(
+            "propertySourceLocations", Arrays.asList(mergedConfig.getPropertySourceLocations()));
+
+        // Property source properties
+        config.put(
+            "propertySourceProperties", Arrays.asList(mergedConfig.getPropertySourceProperties()));
+
+        // Context customizers
+        config.put(
+            "contextCustomizers",
+            mergedConfig.getContextCustomizers().stream()
+                .map(customizer -> customizer.getClass().getName())
+                .collect(Collectors.toList()));
+
+        // Context loader
+        config.put(
+            "contextLoader",
+            mergedConfig.getContextLoader() != null
+                ? mergedConfig.getContextLoader().getClass().getName()
+                : null);
+
+        // Parent context key if any
+        config.put(
+            "parent",
+            mergedConfig.getParent() != null
+                ? "context-" + Math.abs(mergedConfig.getParent().hashCode())
+                : null);
+      }
+
+      return config;
     }
   }
 }

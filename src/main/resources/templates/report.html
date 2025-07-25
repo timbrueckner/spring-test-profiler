@@ -68,6 +68,9 @@
 </footer>
 
 <script>
+  // Expose context statistics as a global window variable for JavaScript libraries
+  window.contextStatistics = /*[[${contextStatisticsJson}]]*/ [];
+
   function toggleClass(element) {
     const methods = element.nextElementSibling;
     methods.classList.toggle('show');
