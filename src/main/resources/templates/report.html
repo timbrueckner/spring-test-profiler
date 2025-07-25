@@ -71,9 +71,10 @@
   </div>
 </footer>
 
+<script type="application/json" id="context-statistics-json" th:utext="${contextStatisticsJson}">[]</script>
 <script>
-  // Expose context statistics as a global window variable for JavaScript libraries
-  window.contextStatistics = /*[[${contextStatisticsJson}]]*/ [];
+  // Initialize empty context statistics (will be populated by ContextComparator initialization)
+  window.contextStatistics = [];
 
   function toggleClass(element) {
     const methods = element.nextElementSibling;
@@ -108,6 +109,7 @@
     init() {
       this.populateDropdowns();
       this.bindEvents();
+      this.preselectDefaultContexts();
     }
 
     populateDropdowns() {
@@ -129,6 +131,27 @@
       });
     }
 
+    preselectDefaultContexts() {
+      if (this.contextData.length >= 2) {
+        const contextASelect = document.getElementById('context-a-select');
+        const contextBSelect = document.getElementById('context-b-select');
+
+        if (contextASelect && contextBSelect) {
+          // Select first context for A
+          contextASelect.value = this.contextData[0].contextKey;
+          this.selectedContextA = this.contextData[0];
+
+          // Select second context for B
+          contextBSelect.value = this.contextData[1].contextKey;
+          this.selectedContextB = this.contextData[1];
+
+          // Update compare button state and trigger comparison
+          this.updateCompareButton();
+          this.compareContexts();
+        }
+      }
+    }
+
     bindEvents() {
       const contextASelect = document.getElementById('context-a-select');
       const contextBSelect = document.getElementById('context-b-select');
@@ -137,31 +160,65 @@
       if (!contextASelect || !contextBSelect || !compareBtn) return;
 
       contextASelect.addEventListener('change', (e) => {
-        this.selectedContextA = this.contextData.find(ctx => ctx.contextKey === e.target.value);
+        if (e.target.value) {
+          this.selectedContextA = this.contextData.find(ctx => ctx.contextKey === e.target.value);
+        } else {
+          this.selectedContextA = null;
+        }
         this.updateCompareButton();
       });
 
       contextBSelect.addEventListener('change', (e) => {
-        this.selectedContextB = this.contextData.find(ctx => ctx.contextKey === e.target.value);
+        if (e.target.value) {
+          this.selectedContextB = this.contextData.find(ctx => ctx.contextKey === e.target.value);
+        } else {
+          this.selectedContextB = null;
+        }
         this.updateCompareButton();
       });
 
-      compareBtn.addEventListener('click', () => {
-        this.compareContexts();
+      compareBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (!compareBtn.disabled) {
+          this.compareContexts();
+        }
       });
     }
 
     updateCompareButton() {
       const compareBtn = document.getElementById('compare-contexts-btn');
+      if (!compareBtn) return;
+
       const canCompare = this.selectedContextA && this.selectedContextB &&
                         this.selectedContextA.contextKey !== this.selectedContextB.contextKey;
+
       compareBtn.disabled = !canCompare;
+
+      // Debug logging
+      console.log('Compare button update:', {
+        selectedContextA: this.selectedContextA?.contextKey,
+        selectedContextB: this.selectedContextB?.contextKey,
+        canCompare: canCompare,
+        disabled: compareBtn.disabled
+      });
     }
 
     compareContexts() {
-      if (!this.selectedContextA || !this.selectedContextB) return;
+      console.log('compareContexts called:', {
+        selectedContextA: this.selectedContextA?.contextKey,
+        selectedContextB: this.selectedContextB?.contextKey
+      });
 
-      document.getElementById('context-comparison-legend').style.display = 'flex';
+      if (!this.selectedContextA || !this.selectedContextB) {
+        console.log('Cannot compare: missing context selection');
+        return;
+      }
+
+      const legend = document.getElementById('context-comparison-legend');
+      if (legend) {
+        legend.style.display = 'flex';
+      }
+
       this.renderComparison();
     }
 
@@ -368,6 +425,17 @@
 
   // Initialize context comparator when DOM is loaded
   document.addEventListener('DOMContentLoaded', () => {
+    // Ensure JSON is parsed first
+    try {
+      const jsonScript = document.getElementById('context-statistics-json');
+      if (jsonScript) {
+        window.contextStatistics = JSON.parse(jsonScript.textContent || '[]');
+      }
+    } catch (e) {
+      console.error('Failed to parse context statistics JSON:', e);
+      window.contextStatistics = [];
+    }
+
     if (window.contextStatistics && window.contextStatistics.length > 0) {
       new ContextComparator();
     }
