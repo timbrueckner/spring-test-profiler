@@ -1200,3 +1200,211 @@ h2 {
         padding: 8px;
     }
 }
+
+/* Context Comparison Visualizer Styles */
+.context-comparison-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.dropdown-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 250px;
+}
+
+.dropdown-container label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.context-dropdown {
+    padding: 10px 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.context-dropdown:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.context-dropdown:hover {
+    border-color: #3498db;
+}
+
+.vs-separator {
+    font-size: 18px;
+    font-weight: bold;
+    color: #7f8c8d;
+    margin: 0 10px;
+    align-self: flex-end;
+    margin-bottom: 8px;
+}
+
+.compare-button {
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-self: flex-end;
+    margin-bottom: 8px;
+}
+
+.compare-button:hover:not(:disabled) {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.compare-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.comparison-legend {
+    display: none;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #34495e;
+}
+
+.legend-color.same-config {
+    background-color: #27ae60;
+}
+
+.legend-color.different-values {
+    background-color: #e74c3c;
+}
+
+.legend-color.only-in-a {
+    background-color: #f39c12;
+}
+
+.legend-color.only-in-b {
+    background-color: #9b59b6;
+}
+
+.comparison-visualization {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.comparison-visualization svg {
+    max-width: 100%;
+    height: auto;
+}
+
+.comparison-tooltip {
+    position: absolute;
+    background: #2c3e50;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 300px;
+    pointer-events: none;
+}
+
+.comparison-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #2c3e50;
+}
+
+.tooltip-content {
+    margin: 0;
+}
+
+/* Responsive adjustments for context comparison */
+@media (max-width: 768px) {
+    .context-comparison-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .dropdown-container {
+        min-width: unset;
+    }
+
+    .vs-separator {
+        align-self: center;
+        margin: 0;
+    }
+
+    .compare-button {
+        align-self: stretch;
+        margin: 0;
+    }
+
+    .comparison-legend {
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .comparison-visualization {
+        padding: 10px;
+        overflow-x: auto;
+    }
+
+    .comparison-tooltip {
+        font-size: 12px;
+        max-width: 250px;
+    }
+}

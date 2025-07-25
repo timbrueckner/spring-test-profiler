@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<div th:fragment="context-comparison-section" class="section">
+  <h2>🔍 Spring Test Context Visualizer</h2>
+  <p>Compare test contexts and identify configuration differences for better context reuse</p>
+
+  <div class="context-comparison-controls">
+    <div class="dropdown-container">
+      <label for="context-a-select">Test Context A:</label>
+      <select id="context-a-select" class="context-dropdown">
+        <option value="">Select Context A</option>
+      </select>
+    </div>
+
+    <div class="vs-separator">vs.</div>
+
+    <div class="dropdown-container">
+      <label for="context-b-select">Test Context B:</label>
+      <select id="context-b-select" class="context-dropdown">
+        <option value="">Select Context B</option>
+      </select>
+    </div>
+
+    <button id="compare-contexts-btn" class="compare-button" disabled>Compare</button>
+  </div>
+
+  <div id="context-comparison-legend" class="comparison-legend" style="display: none;">
+    <div class="legend-item">
+      <span class="legend-color same-config"></span>
+      <span>Same Configuration</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color different-values"></span>
+      <span>Different Values</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color only-in-a"></span>
+      <span>Only in Context A</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color only-in-b"></span>
+      <span>Only in Context B</span>
+    </div>
+  </div>
+
+  <div id="context-comparison-visualization" class="comparison-visualization">
+    <!-- D3.js visualization will be rendered here -->
+  </div>
+
+  <div id="context-comparison-tooltip" class="comparison-tooltip" style="display: none;">
+    <div class="tooltip-content"></div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -7,6 +7,7 @@
     Spring Test Profiler Report</title>
   <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <style th:utext="${cssContent}"></style>
 </head>
 <body>
@@ -26,6 +27,9 @@
 
   <!-- Context Caching Statistics Fragment -->
   <div th:replace="~{fragments/caching :: caching-section(${cacheStats}, ${contextCacheTracker})}"></div>
+
+  <!-- Context Comparison Visualizer Fragment -->
+  <div th:replace="~{fragments/context-comparison :: context-comparison-section}"></div>
 
   <!-- Optimization Recommendations Fragment -->
   <!--  <div th:replace="~{fragments/optimization :: optimization-section(${optimizationStats})}"></div>-->
@@ -90,6 +94,285 @@
       icon.classList.remove('expanded');
     }
   }
+
+  /*<![CDATA[*/
+  // Context Comparison Visualizer using D3.js
+  class ContextComparator {
+    constructor() {
+      this.contextData = window.contextStatistics || [];
+      this.selectedContextA = null;
+      this.selectedContextB = null;
+      this.init();
+    }
+
+    init() {
+      this.populateDropdowns();
+      this.bindEvents();
+    }
+
+    populateDropdowns() {
+      const contextASelect = document.getElementById('context-a-select');
+      const contextBSelect = document.getElementById('context-b-select');
+
+      if (!contextASelect || !contextBSelect) return;
+
+      this.contextData.forEach(context => {
+        const optionA = document.createElement('option');
+        optionA.value = context.contextKey;
+        optionA.textContent = `${context.contextKey} (${context.numberOfBeans} beans, ${context.testClasses.length} classes)`;
+        contextASelect.appendChild(optionA);
+
+        const optionB = document.createElement('option');
+        optionB.value = context.contextKey;
+        optionB.textContent = `${context.contextKey} (${context.numberOfBeans} beans, ${context.testClasses.length} classes)`;
+        contextBSelect.appendChild(optionB);
+      });
+    }
+
+    bindEvents() {
+      const contextASelect = document.getElementById('context-a-select');
+      const contextBSelect = document.getElementById('context-b-select');
+      const compareBtn = document.getElementById('compare-contexts-btn');
+
+      if (!contextASelect || !contextBSelect || !compareBtn) return;
+
+      contextASelect.addEventListener('change', (e) => {
+        this.selectedContextA = this.contextData.find(ctx => ctx.contextKey === e.target.value);
+        this.updateCompareButton();
+      });
+
+      contextBSelect.addEventListener('change', (e) => {
+        this.selectedContextB = this.contextData.find(ctx => ctx.contextKey === e.target.value);
+        this.updateCompareButton();
+      });
+
+      compareBtn.addEventListener('click', () => {
+        this.compareContexts();
+      });
+    }
+
+    updateCompareButton() {
+      const compareBtn = document.getElementById('compare-contexts-btn');
+      const canCompare = this.selectedContextA && this.selectedContextB &&
+                        this.selectedContextA.contextKey !== this.selectedContextB.contextKey;
+      compareBtn.disabled = !canCompare;
+    }
+
+    compareContexts() {
+      if (!this.selectedContextA || !this.selectedContextB) return;
+
+      document.getElementById('context-comparison-legend').style.display = 'flex';
+      this.renderComparison();
+    }
+
+    renderComparison() {
+      const container = d3.select('#context-comparison-visualization');
+      container.selectAll('*').remove();
+
+      const width = 1000;
+      const height = 600;
+      const contextWidth = 400;
+      const contextHeight = 400;
+
+      const svg = container.append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      // Add title
+      svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', 30)
+        .attr('text-anchor', 'middle')
+        .attr('class', 'comparison-title')
+        .style('font-size', '20px')
+        .style('font-weight', 'bold')
+        .text('Spring Test Context Comparison');
+
+      // Context A
+      this.renderContext(svg, this.selectedContextA, 50, 80, 'Test Context A');
+
+      // Context B
+      this.renderContext(svg, this.selectedContextB, 550, 80, 'Test Context B');
+    }
+
+    renderContext(svg, context, x, y, title) {
+      const group = svg.append('g').attr('transform', `translate(${x}, ${y})`);
+
+      // Title
+      group.append('text')
+        .attr('x', 200)
+        .attr('y', 0)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '18px')
+        .style('font-weight', 'bold')
+        .text(title);
+
+      // Central beans circle
+      const centerX = 200;
+      const centerY = 200;
+      const centralRadius = 80;
+
+      group.append('circle')
+        .attr('cx', centerX)
+        .attr('cy', centerY)
+        .attr('r', centralRadius)
+        .attr('fill', '#3498db')
+        .attr('stroke', '#2980b9')
+        .attr('stroke-width', 2);
+
+      group.append('text')
+        .attr('x', centerX)
+        .attr('y', centerY - 10)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', '16px')
+        .style('font-weight', 'bold')
+        .text('Beans');
+
+      group.append('text')
+        .attr('x', centerX)
+        .attr('y', centerY + 10)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .style('font-size', '18px')
+        .style('font-weight', 'bold')
+        .text(`(${context.numberOfBeans})`);
+
+      // Configuration features
+      const features = this.getContextFeatures(context);
+      const angleStep = (2 * Math.PI) / features.length;
+      const satelliteRadius = 140;
+
+      features.forEach((feature, i) => {
+        const angle = i * angleStep - Math.PI / 2;
+        const featureX = centerX + Math.cos(angle) * satelliteRadius;
+        const featureY = centerY + Math.sin(angle) * satelliteRadius;
+
+        const featureGroup = group.append('g')
+          .attr('transform', `translate(${featureX}, ${featureY})`);
+
+        // Feature circle
+        featureGroup.append('circle')
+          .attr('cx', 0)
+          .attr('cy', 0)
+          .attr('r', 25)
+          .attr('fill', this.getFeatureColor(feature))
+          .attr('stroke', '#34495e')
+          .attr('stroke-width', 1)
+          .style('cursor', 'pointer')
+          .on('mouseover', (event) => this.showTooltip(event, feature, context))
+          .on('mouseout', () => this.hideTooltip());
+
+        // Feature label
+        featureGroup.append('text')
+          .attr('x', 0)
+          .attr('y', 35)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '10px')
+          .style('font-weight', 'bold')
+          .text(feature.name);
+
+        // Connecting line
+        group.append('line')
+          .attr('x1', centerX + Math.cos(angle) * (centralRadius + 5))
+          .attr('y1', centerY + Math.sin(angle) * (centralRadius + 5))
+          .attr('x2', featureX - Math.cos(angle) * 30)
+          .attr('y2', featureY - Math.sin(angle) * 30)
+          .attr('stroke', '#bdc3c7')
+          .attr('stroke-width', 2)
+          .attr('stroke-dasharray', '5,5');
+      });
+    }
+
+    getContextFeatures(context) {
+      const config = context.contextConfiguration;
+      return [
+        { name: 'Locations', value: config.locations, key: 'locations' },
+        { name: 'Classes', value: config.classes, key: 'classes' },
+        { name: 'Context Initializer Classes', value: config.contextInitializerClasses, key: 'contextInitializerClasses' },
+        { name: 'Active Profiles', value: config.activeProfiles, key: 'activeProfiles' },
+        { name: 'Property Source Locations', value: config.propertySourceLocations, key: 'propertySourceLocations' },
+        { name: 'Context Customizers', value: config.contextCustomizers, key: 'contextCustomizers' },
+        { name: 'Context Loader', value: [config.contextLoader], key: 'contextLoader' },
+        { name: 'Parent', value: config.parent ? [config.parent] : [], key: 'parent' }
+      ];
+    }
+
+    getFeatureColor(feature) {
+      if (!this.selectedContextA || !this.selectedContextB) return '#95a5a6';
+
+      const configA = this.selectedContextA.contextConfiguration;
+      const configB = this.selectedContextB.contextConfiguration;
+
+      const valueA = this.getFeatureValue(configA, feature.key);
+      const valueB = this.getFeatureValue(configB, feature.key);
+
+      const arrayA = Array.isArray(valueA) ? valueA : [valueA];
+      const arrayB = Array.isArray(valueB) ? valueB : [valueB];
+
+      if (this.arraysEqual(arrayA, arrayB)) {
+        return '#27ae60'; // Same - green
+      } else {
+        return '#e74c3c'; // Different - red
+      }
+    }
+
+    getFeatureValue(config, key) {
+      switch(key) {
+        case 'contextLoader': return config.contextLoader;
+        case 'parent': return config.parent;
+        default: return config[key] || [];
+      }
+    }
+
+    arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((val, i) => val === sortedB[i]);
+    }
+
+    showTooltip(event, feature, context) {
+      const tooltip = document.getElementById('context-comparison-tooltip');
+      const tooltipContent = tooltip.querySelector('.tooltip-content');
+
+      const otherContext = context === this.selectedContextA ? this.selectedContextB : this.selectedContextA;
+      const valueA = this.getFeatureValue(this.selectedContextA.contextConfiguration, feature.key);
+      const valueB = this.getFeatureValue(this.selectedContextB.contextConfiguration, feature.key);
+
+      const arrayA = Array.isArray(valueA) ? valueA : [valueA];
+      const arrayB = Array.isArray(valueB) ? valueB : [valueB];
+
+      let content = `<strong>${feature.name}</strong><br/>`;
+
+      if (this.arraysEqual(arrayA, arrayB)) {
+        content += `<span style="color: #27ae60;">✓ Same configuration</span><br/>`;
+        content += `Value: ${arrayA.length > 0 ? arrayA.join(', ') : 'None'}`;
+      } else {
+        content += `<span style="color: #e74c3c;">✗ Different values</span><br/>`;
+        content += `Context A: ${arrayA.length > 0 ? arrayA.join(', ') : 'None'}<br/>`;
+        content += `Context B: ${arrayB.length > 0 ? arrayB.join(', ') : 'None'}`;
+      }
+
+      tooltipContent.innerHTML = content;
+
+      tooltip.style.display = 'block';
+      tooltip.style.left = (event.pageX + 10) + 'px';
+      tooltip.style.top = (event.pageY - 10) + 'px';
+    }
+
+    hideTooltip() {
+      document.getElementById('context-comparison-tooltip').style.display = 'none';
+    }
+  }
+
+  // Initialize context comparator when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.contextStatistics && window.contextStatistics.length > 0) {
+      new ContextComparator();
+    }
+  });
+  /*]]>*/
 </script>
 </body>
 </html>

@@ -8,15 +8,15 @@
         <div th:if="${cacheStats != null}" class="cache-overview">
             <div class="cache-metric">
                 <span class="label">Cache Size:</span>
-                <span class="value" th:text="${cacheStats.getSize() + ' / ' + cacheStats.getMaxSize()}">0 / 32</span>
+                <span class="value" th:text="${cacheStats.size() + ' / ' + cacheStats.maxSize()}">0 / 32</span>
             </div>
             <div class="cache-metric">
                 <span class="label">Cache Hits:</span>
-                <span class="value" th:text="${cacheStats.getHitCount()}">0</span>
+                <span class="value" th:text="${cacheStats.hitCount()}">0</span>
             </div>
             <div class="cache-metric">
                 <span class="label">Cache Misses:</span>
-                <span class="value" th:text="${cacheStats.getMissCount()}">0</span>
+                <span class="value" th:text="${cacheStats.missCount()}">0</span>
             </div>
             <div class="cache-metric">
                 <span class="label">Cache Hit Rate:</span>
