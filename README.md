@@ -1,4 +1,4 @@
-# Profile Your Spring Tests. Speed Up Your Tests. Ship Faster 🚤
+# Profile Your Tests. Speed Up Your Tests. Ship Faster 🚤
 
 <p align="center">
   <img src="docs/resources/spring-test-profiler-logo-three-256x256.png" alt="Spring Test Profiler Logo" />
