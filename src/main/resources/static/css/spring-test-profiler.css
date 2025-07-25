@@ -1351,7 +1351,8 @@ h2 {
     line-height: 1.4;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    max-width: 300px;
+    max-width: 500px;
+    word-wrap: break-word;
     pointer-events: none;
 }
 
@@ -1405,6 +1406,6 @@ h2 {
 
     .comparison-tooltip {
         font-size: 12px;
-        max-width: 250px;
+        max-width: 400px;
     }
 }

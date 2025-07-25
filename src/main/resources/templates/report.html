@@ -227,7 +227,7 @@
       container.selectAll('*').remove();
 
       const width = 1000;
-      const height = 600;
+      const height = 700; // Increased to accommodate test class names
       const contextWidth = 400;
       const contextHeight = 400;
 
@@ -263,6 +263,16 @@
         .style('font-size', '18px')
         .style('font-weight', 'bold')
         .text(title);
+
+      // Context Key (smaller subtitle)
+      group.append('text')
+        .attr('x', 200)
+        .attr('y', 25)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'normal')
+        .style('fill', '#7f8c8d')
+        .text(context.contextKey);
 
       // Central beans circle
       const centerX = 200;
@@ -339,6 +349,47 @@
           .attr('stroke-width', 2)
           .attr('stroke-dasharray', '5,5');
       });
+
+      // Test classes section below the visualization
+      const testClassesY = centerY + satelliteRadius + 80;
+
+      // Test classes title
+      group.append('text')
+        .attr('x', centerX)
+        .attr('y', testClassesY)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '14px')
+        .style('font-weight', 'bold')
+        .style('fill', '#2c3e50')
+        .text('Test Classes');
+
+      // Display test classes
+      const testClasses = context.testClasses || [];
+      const maxClassesPerLine = 2;
+      const lineHeight = 16;
+
+      testClasses.forEach((testClass, index) => {
+        const line = Math.floor(index / maxClassesPerLine);
+        const col = index % maxClassesPerLine;
+
+        // Calculate position for each test class
+        const startX = centerX - (maxClassesPerLine - 1) * 90;
+        const testClassX = startX + col * 180;
+        const testClassY = testClassesY + 20 + (line * lineHeight);
+
+        // Extract simple class name (last part after dot)
+        const simpleClassName = testClass.split('.').pop();
+
+        group.append('text')
+          .attr('x', testClassX)
+          .attr('y', testClassY)
+          .attr('text-anchor', 'middle')
+          .style('font-size', '11px')
+          .style('font-weight', 'normal')
+          .style('fill', '#34495e')
+          .style('font-family', 'monospace')
+          .text(this.truncateString(simpleClassName, 25));
+      });
     }
 
     getContextFeatures(context) {
@@ -349,6 +400,7 @@
         { name: 'Context Initializer Classes', value: config.contextInitializerClasses, key: 'contextInitializerClasses' },
         { name: 'Active Profiles', value: config.activeProfiles, key: 'activeProfiles' },
         { name: 'Property Source Locations', value: config.propertySourceLocations, key: 'propertySourceLocations' },
+        { name: 'Property Source Properties', value: config.propertySourceProperties, key: 'propertySourceProperties' },
         { name: 'Context Customizers', value: config.contextCustomizers, key: 'contextCustomizers' },
         { name: 'Context Loader', value: [config.contextLoader], key: 'contextLoader' },
         { name: 'Parent', value: config.parent ? [config.parent] : [], key: 'parent' }
@@ -389,6 +441,18 @@
       return sortedA.every((val, i) => val === sortedB[i]);
     }
 
+    truncateString(str, maxLength = 200) {
+      if (!str || str.length <= maxLength) return str;
+      return str.substring(0, maxLength) + '...';
+    }
+
+    formatValueArray(valueArray, maxLength = 200) {
+      if (!valueArray || valueArray.length === 0) return 'None';
+
+      const joinedString = valueArray.join(', ');
+      return this.truncateString(joinedString, maxLength);
+    }
+
     showTooltip(event, feature, context) {
       const tooltip = document.getElementById('context-comparison-tooltip');
       const tooltipContent = tooltip.querySelector('.tooltip-content');
@@ -404,11 +468,11 @@
 
       if (this.arraysEqual(arrayA, arrayB)) {
         content += `<span style="color: #27ae60;">✓ Same configuration</span><br/>`;
-        content += `Value: ${arrayA.length > 0 ? arrayA.join(', ') : 'None'}`;
+        content += `Value: ${this.formatValueArray(arrayA)}`;
       } else {
         content += `<span style="color: #e74c3c;">✗ Different values</span><br/>`;
-        content += `Context A: ${arrayA.length > 0 ? arrayA.join(', ') : 'None'}<br/>`;
-        content += `Context B: ${arrayB.length > 0 ? arrayB.join(', ') : 'None'}`;
+        content += `Context A: ${this.formatValueArray(arrayA)}<br/>`;
+        content += `Context B: ${this.formatValueArray(arrayB)}`;
       }
 
       tooltipContent.innerHTML = content;
