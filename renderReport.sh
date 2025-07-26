@@ -38,7 +38,7 @@ echo
 echo -e "${YELLOW}🧪 Step 2: Running demo tests to generate report...${NC}"
 cd "$DEMO_DIR"
 
-if mvn test -Dtest="*IT" -q; then
+if mvn test -Dtest="*IT" -U -q; then
     echo -e "${GREEN}✅ Demo tests completed successfully${NC}"
 else
     echo -e "${RED}❌ Demo tests failed${NC}"

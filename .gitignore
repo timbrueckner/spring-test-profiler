@@ -120,3 +120,8 @@ $RECYCLE.BIN/
 *.db
 
 PROMPTS.md
+
+
+### JS ###
+coverage/
+node_modules

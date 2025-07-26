@@ -4,6 +4,29 @@ on:
   push:
 
 jobs:
+  javascript-tests:
+    name: JavaScript Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+          cache: 'npm'
+          cache-dependency-path: 'src/main/resources/static/js/package-lock.json'
+
+      - name: Install JavaScript dependencies
+        working-directory: src/main/resources/static/js
+        run: npm ci
+
+      - name: Run JavaScript tests
+        working-directory: src/main/resources/static/js
+        run: npm run test
+
   test-extension:
     name: Test Extension
     runs-on: ubuntu-latest
@@ -102,13 +125,20 @@ jobs:
   summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [test-extension, test-maven-demos, test-gradle-demos]
+    needs: [javascript-tests, test-extension, test-maven-demos, test-gradle-demos]
     if: always()
 
     steps:
       - name: Test Results Summary
         run: |
           echo "## Test Results Summary"
+          echo ""
+          echo "### JavaScript Tests"
+          if [ "${{ needs.javascript-tests.result }}" == "success" ]; then
+            echo "✅ JavaScript tests passed"
+          else
+            echo "❌ JavaScript tests failed"
+          fi
           echo ""
           echo "### Extension Tests"
           if [ "${{ needs.test-extension.result }}" == "success" ]; then
@@ -118,22 +148,29 @@ jobs:
           fi
           echo ""
           echo "### Demo Projects"
-          echo "Demo tests status: ${{ needs.test-demos.result }}"
+          echo "Maven demos status: ${{ needs.test-maven-demos.result }}"
+          echo "Gradle demos status: ${{ needs.test-gradle-demos.result }}"
           echo ""
           echo "Note: Individual demo project results can be found in the workflow run details."
 
       - name: Check critical failures
-        if: needs.test-extension.result == 'failure'
+        if: needs.javascript-tests.result == 'failure' || needs.test-extension.result == 'failure'
         run: |
-          echo "Critical failure: Extension tests failed"
+          echo "Critical failure: Core tests failed"
+          if [ "${{ needs.javascript-tests.result }}" == "failure" ]; then
+            echo "JavaScript tests failed"
+          fi
+          if [ "${{ needs.test-extension.result }}" == "failure" ]; then
+            echo "Extension tests failed"
+          fi
           exit 1
 
       - name: Final status
         run: |
-          if [ "${{ needs.test-extension.result }}" == "success" ]; then
-            echo "✅ Core extension tests passed - build is acceptable"
+          if [ "${{ needs.javascript-tests.result }}" == "success" ] && [ "${{ needs.test-extension.result }}" == "success" ]; then
+            echo "✅ Core tests (JavaScript + Extension) passed - build is acceptable"
             echo "Check individual demo results in the matrix job above"
           else
-            echo "Build failed due to extension test failures"
+            echo "Build failed due to core test failures"
             exit 1
           fi
