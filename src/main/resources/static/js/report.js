@@ -152,7 +152,7 @@ class ContextComparator {
     container.selectAll('*').remove();
 
     const width = 1000;
-    const height = 450; // Reduced height since test classes moved out
+    const height = 600; // Increased height to accommodate bigger visualization
     const contextWidth = 400;
     const contextHeight = 400;
 
@@ -171,10 +171,10 @@ class ContextComparator {
       .text('Spring Test Context Comparison');
 
     // Context A
-    this.renderContext(svg, this.selectedContextA, 50, 80, 'Test Context A');
+    this.renderContext(svg, this.selectedContextA, 50, 100, 'Test Context A');
 
     // Context B
-    this.renderContext(svg, this.selectedContextB, 550, 80, 'Test Context B');
+    this.renderContext(svg, this.selectedContextB, 550, 100, 'Test Context B');
 
     // Render test classes lists below SVG
     this.renderTestClassesLists();
@@ -204,7 +204,7 @@ class ContextComparator {
 
     // Central beans circle
     const centerX = 200;
-    const centerY = 200;
+    const centerY = 240; // Increased from 200 to provide more space below titles
     const centralRadius = 80;
 
     group.append('circle')
@@ -282,13 +282,13 @@ class ContextComparator {
   renderTestClassesLists() {
     const container = document.getElementById('context-comparison-visualization');
 
-    // Create or update test classes container
+    // Create or update test classes container - append to same container as SVG, not parent
     let testClassesContainer = document.getElementById('test-classes-container');
     if (!testClassesContainer) {
       testClassesContainer = document.createElement('div');
       testClassesContainer.id = 'test-classes-container';
       testClassesContainer.style.cssText = 'display: flex; justify-content: space-between; margin-top: 20px; gap: 40px;';
-      container.parentNode.appendChild(testClassesContainer);
+      container.appendChild(testClassesContainer);
     }
     testClassesContainer.innerHTML = '';
 

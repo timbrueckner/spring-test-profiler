@@ -203,6 +203,10 @@ public class TestExecutionReporter {
       String cssContent = loadCssContent();
       context.setVariable("cssContent", cssContent);
 
+      // Load JS content
+      String jsContent = loadJsContent();
+      context.setVariable("jsContent", jsContent);
+
       // Register helper beans for templates
       registerHelperBeans(context, contextCacheTracker);
 
@@ -256,6 +260,22 @@ public class TestExecutionReporter {
     } catch (Exception e) {
       logger.error("Could not load CSS file. Report generation will fail.", e);
       throw new RuntimeException("CSS file not found", e);
+    }
+  }
+
+  private String loadJsContent() {
+    try {
+      // Use InputStream to read from classpath resource which works both in IDE and JAR
+      try (var inputStream =
+          getClass().getClassLoader().getResourceAsStream("static/js/report.js")) {
+        if (inputStream == null) {
+          throw new RuntimeException("JS file not found in classpath: static/js/report.js");
+        }
+        return new String(inputStream.readAllBytes());
+      }
+    } catch (Exception e) {
+      logger.error("Could not load JS file. Report generation will fail.", e);
+      throw new RuntimeException("JS file not found", e);
     }
   }
 }
