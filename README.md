@@ -6,6 +6,8 @@
 
 A Spring Test utility that provides visualization and insights for Spring Test execution, with a focus on Spring context caching statistics.
 
+[More information](https://pragmatech.digital/products/spring-test-profiler/) about the profiler.
+
 ## Features
 
 **Overall goal**: Identify optimization opportunities in your Spring Test suite to speed up your builds and ship to production faster and with more confidence 🚤
@@ -122,7 +124,7 @@ After test execution, find the HTML report at:
 
 ## Demo Report
 
-Download the full sample report [here](docs/test-profiler-report-pet-clinic-2025-07-latest.html) and open it in your browser.
+Access a demo Spring Test Profiler report [here](https://pragmatech.digital/products/spring-test-profiler/).
 
 ## Bug Reports
 
