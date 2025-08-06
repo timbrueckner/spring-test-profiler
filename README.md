@@ -6,7 +6,7 @@
 
 A Spring Test utility that provides visualization and insights for Spring Test execution, with a focus on Spring context caching statistics.
 
-[More information](https://pragmatech.digital/products/spring-test-profiler/) about the profiler.
+Find [more information](https://pragmatech.digital/products/spring-test-profiler/) about the profiler on our website.
 
 ## Features
 
