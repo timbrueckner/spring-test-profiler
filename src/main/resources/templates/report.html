@@ -74,5 +74,73 @@
 
 <script type="application/json" id="context-statistics-json" th:utext="${contextStatisticsJson}">[]</script>
 <script src="static/js/report.js"></script>
+<script>
+    function changeSortOption() {
+        const sortOption = document.getElementById('sortOption').value;
+        const testClassContainer = findTestExecutionSection();
+        
+        if (!testClassContainer) return;
+
+        const testClasses = Array.from(testClassContainer.querySelectorAll('div.test-class[data-duration]'));
+        sortAndReorderElements(testClasses, testClassContainer, sortOption);
+    }
+
+    function findTestExecutionSection() {
+        const headers = document.querySelectorAll('h2');
+        for (const header of headers) {
+            if (header.textContent.trim() === 'Test Execution Details') {
+                return header.parentElement;
+            }
+        }
+        return null;
+    }
+
+    function sortAndReorderElements(testClasses, container, sortOption) {
+        // Sort test classes
+        testClasses.sort((a, b) => getSortComparison(a, b, sortOption));
+
+        // Re-append test classes and sort their methods
+        testClasses.forEach(testClass => {
+            container.appendChild(testClass);
+            sortTestMethods(testClass, sortOption);
+        });
+    }
+
+    function sortTestMethods(testClass, sortOption) {
+        const testMethods = Array.from(testClass.querySelectorAll('.test-method'));
+        const testMethodsContainer = testClass.querySelector('.test-methods');
+
+        if (testMethodsContainer && testMethods.length > 0) {
+            testMethods.sort((a, b) => getSortComparison(a, b, sortOption));
+            testMethods.forEach(testMethod => testMethodsContainer.appendChild(testMethod));
+        }
+    }
+
+    function getSortComparison(a, b, sortOption) {
+        switch (sortOption) {
+            case 'duration':
+                return parseInt(b.dataset.duration || '0') - parseInt(a.dataset.duration || '0');
+            case 'name':
+                return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+            case 'failed':
+                const aFailed = parseInt(a.dataset.failed || '0');
+                const bFailed = parseInt(b.dataset.failed || '0');
+                if (aFailed !== bFailed) {
+                    return bFailed - aFailed; // Failed first
+                }
+                // If same failed count, sort by duration descending
+                return parseInt(b.dataset.duration || '0') - parseInt(a.dataset.duration || '0');
+            default:
+                return 0;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const sortSelect = document.getElementById('sortOption');
+        if (sortSelect) {
+            sortSelect.value = 'duration';
+        }
+    });
+</script>
 </body>
 </html>
